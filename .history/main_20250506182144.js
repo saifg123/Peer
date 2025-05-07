@@ -1,0 +1,19 @@
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getAuth, signInWith Popup, GoogleAuthProvider}
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDgt47saNP2MY1CYZ9DKlMUIBvLODhbSoY",
+  authDomain: "peer-a2a78.firebaseapp.com",
+  projectId: "peer-a2a78",
+  storageBucket: "peer-a2a78.firebasestorage.app",
+  messagingSenderId: "366889068662",
+  appId: "1:366889068662:web:ffa8754a3ce3330396d757",
+  measurementId: "G-98GY2G56G4"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);

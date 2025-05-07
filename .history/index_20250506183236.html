@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Website</title>
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.ss">
+</head>
+<body>
+  <div class="header">
+   
+    <!-- Guest Sign In Icon -->
+<!-- Guest Icon (Simple Circles) -->
+ 
+<!-- Firebase App (core SDK) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDgt47saNP2MY1CYZ9DKlMUIBvLODhbSoY",
+    authDomain: "peer-a2a78.firebaseapp.com",
+    projectId: "peer-a2a78",
+    storageBucket: "peer-a2a78.firebasestorage.app",
+    messagingSenderId: "366889068662",
+    appId: "1:366889068662:web:ffa8754a3ce3330396d757",
+    measurementId: "G-98GY2G56G4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  const googleSignInBtn = document.getElementById("googleSignInBtn");
+
+  googleSignInBtn.addEventListener("click", () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        console.log("Signed in with Google as:", user.displayName, user.email);
+        alert("Welcome " + user.displayName);
+      })
+      .catch((error) => {
+        console.error("Google Sign-In error:", error.code, error.message);
+        alert("Google Sign-In failed: " + error.message);
+      });
+  });
+</script>
+ 
+
+<div class="guest-login">
+    <a href= "signin.html" class="guest-link">
+      <div class="guest-avatar">
+        <div class="avatar-head"></div>
+        <div class="avatar-body"></div>
+      </div>
+      <div class="guest-label">Sign In</div>
+    </a>
+  </div>
+  
+  
+    <!-- Dropdown (to the left of the logo) -->
+    <div class="dropdown">
+      <button class="dropbtn">
+        <div class="haburger">
+          <div clas="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+        </div>
+      </button>
+      <div class="dropdown-content">
+        <a href="#sign-up">Sign Up</a>
+        <a href="#ai-model">AI Model</a>
+        <a href="#about-us">About Us</a>
+      </div>
+    </div>
+
+    <!-- PeerPlanner Logo -->
+    <div class="logo">
+      <h1>Peer</h1>
+    </div>
+  </div>
+
+  <!-- Centered Navigation Boxes -->
+<div class="nav-boxes-centered">
+    <a href="#try" class="nav-box">Try</a>
+    <a href="#change-ai" class="nav-box">Change AI Model</a>
+    <a href="#about-us" class="nav-box">About Us</a>
+  </div>
+  
+
+  <div class="quote-container">
+    <div class="typing-quote" id="typingQuote"></div>
+  </div>
+  
+  <div class="reviews">
+    <div class="review-card">
+      <div class="card-inner">
+        <div class="card-front">
+          <h3>@productivityQueen</h3>
+          <p>★★★★★</p>
+        </div>
+        <div class="card-back">
+          <p>This app completely changed how I manage my tasks. I'm getting more done than ever!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="review-card">
+      <div class="card-inner">
+        <div class="card-front">
+          <h3>@timeSaver99</h3>
+          <p>★★★★☆</p>
+        </div>
+        <div class="card-back">
+          <p>PeerPlanner helped me stop procrastinating. Highly recommend for students!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="review-card">
+      <div class="card-inner">
+        <div class="card-front">
+          <h3>@organizedLife</h3>
+          <p>★★★★★</p>
+        </div>
+        <div class="card-back">
+          <p>I never thought planning could be this fun and effective. Great design and easy to use!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelector('.dropbtn').addEventListener('click', function () {
+      document.querySelector('.dropdown').classList.toggle('active');
+    });
+  </script>
+  <script>
+    const text = "Your key to productivity";
+    const quoteEl = document.getElementById("typingQuote");
+    let index = 0;
+  
+    function typeLetterByLetter() {
+      if (index < text.length) {
+        quoteEl.innerHTML += text.charAt(index);
+        index++;
+        setTimeout(typeLetterByLetter, 90); // Adjust speed here (ms per letter)
+      } else {
+        // Remove blinking cursor after done
+        quoteEl.style.borderRight = "none";
+      }
+    }
+  
+    window.addEventListener("load", typeLetterByLetter);
+  </script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>

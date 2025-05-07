@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Righteous', cursive;
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .sign-in-container {
+      text-align: center;
+    }
+
+    .guest-avatar-large {
+      width: 120px;
+      height: 120px;
+      border: 4px solid #222;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 30px;
+    }
+
+    .avatar-head {
+      width: 40px;
+      height: 40px;
+      background-color: #222;
+      border-radius: 50%;
+    }
+
+    .avatar-body {
+      width: 60px;
+      height: 30px;
+      background-color: #222;
+      border-radius: 30px 30px 0 0;
+      margin-top: 5px;
+    }
+
+    .input-box {
+      margin: 10px 0;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 250px;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #222;
+      border-radius: 8px;
+      outline: none;
+      font-family: 'Righteous', cursive;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: #007BFF;
+    }
+
+    .password-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    #passwordInput {
+      padding-right: 40px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      transition: opacity 0.3s ease;
+      fill: #444;
+    }
+
+    .toggle-password:hover {
+      fill: #007BFF;
+    }
+
+    .forgot-password {
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+
+    .forgot-password a {
+      text-decoration: none;
+      color: #007BFF;
+      font-size: 14px;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+
+    .submit-btn {
+      background-color: #222;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Righteous', cursive;
+      transition: background-color 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #007BFF;
+    }
+
+    .icon-layer {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+    }
+
+    .icon-layer svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transition: opacity 0.3s ease;
+    }
+
+    .icon-hidden {
+      opacity: 0;
+    }
+
+    .icon-visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sign-in-container">
+    <div class="guest-avatar-large">
+      <div class="avatar-head"></div>
+      <div class="avatar-body"></div>
+    </div>
+
+    <div class="input-box">
+      <input type="text" placeholder="Username" />
+    </div>
+
+    <div class="input-box password-wrapper">
+      <input type="password" id="passwordInput" placeholder="Password" />
+
+      <!-- Two-layer animated icon -->
+      <div class="icon-layer">
+      <!-- Eye Open -->
+<svg id="eyeOpen" class="icon-visible" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 5C7 5 2.7 8.1 1 12c1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 12c-2.8 
+             0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5zm0-8c-1.7 0-3 1.3-3 3s1.3 3 
+             3 3 3-1.3 3-3-1.3-3-3-3z"/>
+  </svg>
+  
+  <!-- Eye Closed (fixed path) -->
+  <svg id="eyeClosed" class="icon-hidden" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M1 4.27L2.28 3 21 21.72 19.73 23l-2.27-2.27C15.6 21 13.86 21.5 12 
+             21.5c-5 0-9.3-3.1-11-7 1.1-2.6 3.1-4.7 5.5-6.1L1 4.27zM12 6.5c4.7 0 
+             8.6 2.8 10 6.5-.5 1.2-1.2 2.3-2.1 3.3l-2.1-2.1c.2-.4.3-.9.3-1.4 
+             0-2.2-1.8-4-4-4-.5 0-1 .1-1.4.3l-2.1-2.1C10.7 6.6 11.3 6.5 12 6.5zm-3 
+             3c0 .6.2 1.2.5 1.7l-3.8-3.8c.8-.6 1.8-1.1 2.8-1.4l1.5 1.5c-.3.5-.5 
+             1-.5 1.7z"/>
+  </svg>
+  
+    </div>
+
+    <div class="forgot-password">
+      <a href="#">Forgot password?</a>
+    </div>
+
+    <button class="submit-btn">Submit</button>
+  </div>
+
+  <script>
+    const passwordInput = document.getElementById('passwordInput');
+    const eyeOpen = document.getElementById('eyeOpen');
+    const eyeClosed = document.getElementById('eyeClosed');
+
+    let passwordVisible = false;
+
+    eyeOpen.parentElement.addEventListener('click', () => {
+      passwordVisible = !passwordVisible;
+      passwordInput.setAttribute('type', passwordVisible ? 'text' : 'password');
+
+      // Animate toggle
+      eyeOpen.classList.toggle('icon-visible', !passwordVisible);
+      eyeOpen.classList.toggle('icon-hidden', passwordVisible);
+
+      eyeClosed.classList.toggle('icon-visible', passwordVisible);
+      eyeClosed.classList.toggle('icon-hidden', !passwordVisible);
+    });
+  </script>
+            <script src="main.js"></script>
+</body>
+</html>
