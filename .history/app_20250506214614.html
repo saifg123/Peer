@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Peer Calendar</title>
+  <link rel="stylesheet" href="stylesapp.css"/>
+</head>
+<body>
+  <div class="calendar-container">
+    <header class="calendar-header">
+      <button id="prev-month">&#9664;</button>
+      <h1 id="month-year">May 2025</h1>
+      <button id="next-month">&#9654;</button>
+    </header>
+
+    <div class="calendar-views">
+      <button class="view-btn active" data-view="month">Month</button>
+      <button class="view-btn" data-view="week">Week</button>
+      <button class="view-btn" data-view="biweekly">Bi-Weekly</button>
+      <button class="view-btn" data-view="semester">Semester</button>
+    </div>
+
+    <!-- Container for month view -->
+    <div class="calendar-grid" id="month-view">
+      <div class="day-name">Sun</div>
+      <div class="day-name">Mon</div>
+      <div class="day-name">Tue</div>
+      <div class="day-name">Wed</div>
+      <div class="day-name">Thu</div>
+      <div class="day-name">Fri</div>
+      <div class="day-name">Sat</div>
+      <!-- Dynamic days will be inserted here by JS -->
+    </div>
+
+    <!-- Container for the semester view (mini-calendars for Aug-Dec) -->
+    <div class="semester-view" id="semester-view"></div>
+
+    <!-- Container for weekly view -->
+    <div class="week-view" id="week-view">
+      <!-- This will be populated dynamically -->
+    </div>
+
+    <!-- Container for bi-weekly view -->
+    <div class="biweekly-view" id="biweekly-view">
+      <!-- This will be populated dynamically -->
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

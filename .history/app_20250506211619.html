@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Peer Calendar</title>
+  <link rel="stylesheet" href="stylesapp.css"/>
+</head>
+<body>
+  <div class="calendar-container">
+    <header class="calendar-header">
+      <button id="prev-month">&#9664;</button>
+      <h1 id="month-year">May 2025</h1>
+      <button id="next-month">&#9654;</button>
+    </header>
+
+    <div class="calendar-views">
+      <button class="view-btn active" data-view="month">Month</button>
+      <button class="view-btn" data-view="week">Week</button>
+      <button class="view-btn" data-view="biweekly">Bi-Weekly</button>
+      <button class="view-btn" data-view="semester">Semester</button>
+    </div>
+
+    <div class="calendar-grid">
+      <div class="day-name">Sun</div>
+      <div class="day-name">Mon</div>
+      <div class="day-name">Tue</div>
+      <div class="day-name">Wed</div>
+      <div class="day-name">Thu</div>
+      <div class="day-name">Fri</div>
+      <div class="day-name">Sat</div>
+
+      <!-- Static placeholders — will be replaced with dynamic JS later -->
+      <div class="day"><span class="date">1</span></div>
+      <div class="day"><span class="date">2</span></div>
+      <div class="day"><span class="date">3</span></div>
+      <div class="day"><span class="date">4</span></div>
+      <div class="day"><span class="date">5</span></div>
+      <div class="day"><span class="date">6</span></div>
+      <div class="day"><span class="date">7</span></div>
+      <!-- You can add more here or generate with JS -->
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

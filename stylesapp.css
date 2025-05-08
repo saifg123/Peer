@@ -1,0 +1,196 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  .calendar-app {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+  
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f1f1f1;
+    padding: 12px 20px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  button {
+    font-size: 18px;
+    padding: 6px 12px;
+    border: none;
+    background: #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background: #d0d0d0;
+  }
+  
+  #calendar {
+    padding: 20px;
+  }
+  
+  /* Day View */
+  .day-grid {
+    display: grid;
+    grid-template-rows: repeat(24, 40px);
+    border-left: 1px solid #ccc;
+    position: relative;
+  }
+  
+  .hour-cell {
+    border-top: 1px solid #eee;
+    padding-left: 50px;
+    position: relative;
+  }
+  
+  .hour-cell span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 12px;
+    color: #888;
+  }
+  
+  /* Week View */
+  .week-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .week-labels {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #fafafa;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .week-label {
+    text-align: center;
+    padding: 8px 0;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  
+  .week-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    height: 40px;
+  }
+  
+  .week-cell {
+    border: 1px solid #eee;
+  }
+  
+  /* Month View */
+  .month-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .month-labels {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #fafafa;
+  }
+  
+  .month-label {
+    text-align: center;
+    font-weight: bold;
+    padding: 8px 0;
+  }
+  
+  .month-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    height: 80px;
+  }
+  
+  .month-cell {
+    border: 1px solid #eee;
+    padding: 6px;
+    font-size: 14px;
+    text-align: right;
+    vertical-align: top;
+  }
+  
+  .month-cell.empty {
+    background: #f9f9f9;
+    color: #ccc;
+  }
+/* Animation wrapper for calendar transitions */
+/* Calendar transition animation */
+.calendar-view {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  .calendar-view.transitioning {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  
+  /* Hover cells */
+  .day-cell:hover,
+  .week-cell:hover,
+  .month-cell:hover {
+    background-color: #e0e0ff;
+    cursor: pointer;
+  }
+  
+  /* Labels */
+  .day-header {
+    text-align: center;
+    font-weight: bold;
+    padding: 8px;
+    background: #f0f0f0;
+  }
+  
+  /* Grids (minimal styling — customize as needed) */
+  .day-grid, .week-grid, .month-grid {
+    display: grid;
+  }
+  
+  .day-grid {
+    grid-template-rows: repeat(24, 1fr);
+  }
+  
+  .week-grid .week-labels {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f8f8f8;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .week-grid .week-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+  
+  .month-grid .month-labels {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-weight: bold;
+    text-align: center;
+    background: #f8f8f8;
+  }
+  
+  .month-grid .month-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+  
+    
