@@ -929,16 +929,4 @@
   .dashboard-sidebar:focus {
     outline: none;
   }
-  /* Hide fade-in icon when not hovering/focused */
-  .dashboard-sidebar button .sidebar-fade-icon {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.32s cubic-bezier(.4,1.4,.6,1) 0.12s;
-  }
-  .dashboard-sidebar:hover button .sidebar-fade-icon,
-  .dashboard-sidebar:focus-within button .sidebar-fade-icon {
-    opacity: 1;
-    pointer-events: auto;
-    transition-delay: 0.12s;
-  }
 </style>

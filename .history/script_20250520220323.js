@@ -510,13 +510,10 @@ animate();
 
 
 
-  /*
-  Fix: Remove lingering drop-bounce classes before re-adding for new drop.
-  This ensures the animation doesn't keep playing after drop.
-  */
-  calendarEl.querySelectorAll(".note-banner.drop-bounce").forEach(b => {
-    b.classList.remove("drop-bounce");
-  });
+
+calendarEl.addEventListener("dragend", (e) => {
+  document.querySelectorAll(".note-banner.dragging").forEach(b => b.classList.remove("dragging"));
+});
 // Add drag & drop listeners
 
 

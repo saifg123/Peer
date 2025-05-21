@@ -138,131 +138,6 @@
     }
     /* Dashboard sidebar minimized and hover-expand styles */
     .dashboard-sidebar {
-      width: 64px;
-      min-width: 64px;
-      max-width: 64px;
-      transition: width 0.22s cubic-bezier(.4,1.4,.6,1), box-shadow 0.18s;
-      overflow: hidden;
-      box-shadow: none;
-      padding-left: 0;
-      padding-right: 0;
-      align-items: center;
-      display: flex;
-    .dashboard-sidebar button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      margin-bottom: 18px;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      min-width: 48px;
-      border-left: 4px solid #e0e0e0;
-      transition: border-width 0.22s cubic-bezier(.4,1.4,.6,1), border-color 0.22s cubic-bezier(.4,1.4,.6,1);
-        }
-        .dashboard-sidebar:hover {
-      border-left-width: 16px;
-      border-left-color: #007bff;
-      border: none;
-        }
-      max-width: 48px;
-      gap: 0;
-      transition: background 0.15s;
-      border-radius: 6px;
-      min-height: 44px;
-      font-size: 15px;
-      color: #444;
-    }
-    }
-    .dashboard-sidebar button {
-      justify-content: center;
-      padding-left: 0;
-      padding-right: 0;
-      width: 48px;
-      min-width: 48px;
-      max-width: 48px;
-      gap: 0;
-    }
-    .dashboard-sidebar button svg {
-      margin: 0 auto;
-      display: block;
-    }
-    .dashboard-sidebar:not(:hover):not(:focus-within) button:not(:first-child) {
-      display: none;
-    }
-    .dashboard-sidebar:hover,
-    .dashboard-sidebar:focus-within {
-      width: 180px;
-      min-width: 180px;
-      max-width: 180px;
-      box-shadow: 2px 0 12px rgba(0,0,0,0.07);
-      z-index: 102;
-      align-items: flex-start;
-      /* outline removed to prevent weird outline artifact */
-    }
-    .dashboard-sidebar:hover button,
-    .dashboard-sidebar:focus-within button {
-      display: flex;
-      justify-content: flex-start;
-      width: 100%;
-      min-width: 100%;
-      max-width: 100%;
-      gap: 14px;
-      padding-left: 10px;
-    }
-    .dashboard-sidebar:not(:hover):not(:focus-within) button span {
-      display: none;
-    }
-    .dashboard-sidebar:hover button span,
-    .dashboard-sidebar:focus-within button span,
-    .dashboard-sidebar:hover button span {
-      display: inline;
-      margin-left: 8px;
-      transition: margin-left 0.22s cubic-bezier(.4,1.4,.6,1);
-    }
-    .dashboard-sidebar,
-    .dashboard-sidebar button,
-    .dashboard-sidebar button span {
-      transition: width 0.22s cubic-bezier(.4,1.4,.6,1), 
-            min-width 0.22s cubic-bezier(.4,1.4,.6,1), 
-            max-width 0.22s cubic-bezier(.4,1.4,.6,1), 
-            box-shadow 0.18s, 
-            gap 0.22s cubic-bezier(.4,1.4,.6,1), 
-            padding-left 0.22s cubic-bezier(.4,1.4,.6,1), 
-            background 0.15s, 
-            color 0.15s, 
-            margin-left 0.22s cubic-bezier(.4,1.4,.6,1);
-    }
-
-    /* Remove border from dashboard sidebar and its buttons */
-    /* Prevent color change on dashboard sidebar hover */
-    .dashboard-sidebar:hover,
-    .dashboard-sidebar:focus-within {
-      background: inherit !important;
-    }
-    body.dark-mode .dashboard-sidebar:hover,
-    body.dark-mode .dashboard-sidebar:focus-within {
-      background: inherit !important;
-    }
-    .dashboard-sidebar::after {
-      height: 100vh;
-      top: 0;
-    }
-    .dashboard-sidebar,
-    .dashboard-sidebar button {
-      border: none !important;
-      box-shadow: none !important;
-    }
-
-    /* Make the vertical line in the sidebar full height */
-    .dashboard-sidebar::after {
-      height: 100vh;
-      top: 0;
-    }
-
-    .dashboard-sidebar {
       width: 48px;
       min-width: 48px;
       max-width: 48px;
@@ -357,49 +232,62 @@
      <img src="profile.jpg" alt="Profile" class="profile-icon" />
 
   </header>
-  <footer id="dynamic-footer" style="position:fixed;left:0;right:0;bottom:0;width:100%;background:#222;color:#fff;text-align:center;padding:2px 0;height:20px;transition:height 0.3s, padding 0.3s, font-size 0.3s;font-size:10px;z-index:150;">
+  <footer id="dynamic-footer" style="position:fixed;left:0;right:0;bottom:0;width:100%;background:#222;color:#fff;text-align:center;padding:2px 0;height:20px;transition:height 0.3s, padding 0.3s, font-size 0.3s;font-size:10px;z-index:150;"></footer>
     Peer Calendar &copy; 2024
   </footer>
+  <script>
+    (function() {
+      const footer = document.getElementById('dynamic-footer');
+      function adjustFooter() {
+        const scrollY = window.scrollY || window.pageYOffset;
+        // Tiny at first: min height 16px, max 48px
+        const minH = 16, maxH = 48;
+        const minPad = 2, maxPad = 12;
+        // Scale height/padding with scroll, up to 600px scroll
+        const factor = Math.min(scrollY / 600, 1);
+        const height = minH + (maxH - minH) * factor;
+        const pad = minPad + (maxPad - minPad) * factor;
+        footer.style.height = height + "px";
+        footer.style.paddingTop = pad + "px";
+        footer.style.paddingBottom = pad + "px";
+        footer.style.fontSize = (10 + 6 * factor) + "px";
+      }
+      window.addEventListener('scroll', adjustFooter);
+      adjustFooter();
+    })();
+  </script>
+  <!-- Add dummy content to make the page longer for scrolling -->
+  <div style="height: 1800px; background: linear-gradient(to bottom, transparent 0%, #f7f7f7 100%); pointer-events: none; position: absolute; left: 0; right: 0; z-index: 0;"></div>
   <div class="app-container">
-    <nav class="dashboard-sidebar">
+    <!-- Calendar Panel -->
+    <!-- Vertical Dashboard -->
+    <nav class="dashboard-sidebar" style="width:64px;min-width:64px;max-width:64px; background:#f5f5f5; border-right:1px solid #e0e0e0; height:100vh; position:sticky; top:0; display:flex; flex-direction:column; align-items:center; padding:16px 0; z-index:101;">
       <!-- Example dashboard icons/buttons -->
-      <button title="Home">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
-          <path d="M4 13L14 5l10 8v9a2 2 0 0 1-2 2h-4v-6h-8v6H6a2 2 0 0 1-2-2v-9z" stroke="#444" stroke-width="2" fill="none"/>
-        </svg>
+      <button title="Home" style="background:none;border:none;margin-bottom:18px;cursor:pointer;padding:0;">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
+        <path d="M4 13L14 5l10 8v9a2 2 0 0 1-2 2h-4v-6h-8v6H6a2 2 0 0 1-2-2v-9z" stroke="#444" stroke-width="2" fill="none"/>
+      </svg>
       </button>
-      <button title="Calendar">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
-          <rect x="4" y="7" width="20" height="16" rx="2" stroke="#444" stroke-width="2" fill="none"/>
-          <path d="M4 11h20" stroke="#444" stroke-width="2"/>
-        </svg>
+      <button title="Calendar" style="background:none;border:none;margin-bottom:18px;cursor:pointer;padding:0;">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
+        <rect x="4" y="7" width="20" height="16" rx="2" stroke="#444" stroke-width="2" fill="none"/>
+        <path d="M4 11h20" stroke="#444" stroke-width="2"/>
+      </svg>
       </button>
-      <button title="Tasks">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
-          <rect x="6" y="6" width="16" height="16" rx="3" stroke="#444" stroke-width="2" fill="none"/>
-          <path d="M10 14h8M10 18h5" stroke="#444" stroke-width="2" stroke-linecap="round"/>
-        </svg>
+      <button title="Tasks" style="background:none;border:none;margin-bottom:18px;cursor:pointer;padding:0;"></button>
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
+        <rect x="6" y="6" width="16" height="16" rx="3" stroke="#444" stroke-width="2" fill="none"/>
+        <path d="M10 14h8M10 18h5" stroke="#444" stroke-width="2" stroke-linecap="round"/>
+      </svg>
       </button>
-      <button title="Settings" style="margin-top:auto;">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false" style="display:block;margin-left:0;margin-right:auto;transition:transform 0.22s cubic-bezier(.4,1.4,.6,1);"></svg>
-          <path d="M13.5 4.5a1 1 0 0 1 1 1V7h2a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h2V9a2 2 0 0 1 2-2h2V5.5a1 1 0 0 1 1-1z" stroke="#444" stroke-width="2" fill="none"/>
-        </svg>
-        <style>
-          .dashboard-sidebar {
-            transition: width 0.22s cubic-bezier(.4,1.4,.6,1), box-shadow 0.18s, background 0.22s;
-          }
-          .dashboard-sidebar:hover {
-            background: #f5f5f5;
-            transition: background 0.22s cubic-bezier(.4,1.4,.6,1), width 0.22s cubic-bezier(.4,1.4,.6,1), box-shadow 0.18s;
-          }
-          body.dark-mode .dashboard-sidebar:hover {
-            background: #232323;
-          }
-        </style>
-        <span>Settings</span>
+      <button title="Settings" style="background:none;border:none;margin-top:auto;cursor:pointer;padding:0;">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
+        <circle cx="14" cy="14" r="4" stroke="#444" stroke-width="2" fill="none"/>
+        <path d="M14 4v2M14 22v2M4 14h2M22 14h2M7.8 7.8l1.4 1.4M18.8 18.8l1.4 1.4M7.8 20.2l1.4-1.4M18.8 9.2l1.4-1.4" stroke="#444" stroke-width="2"/>
+      </svg>
       </button>
     </nav>
-    <div class="calendar-app">
+    <div class="calendar-app"></div>
       <div id="calendar-controls">
       <button type="button" id="prev" style="display:none;">&larr;</button>
       <button type="button" id="notification-btn" title="Notifications" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">
@@ -408,57 +296,6 @@
         <path d="M11 20c1.1 0 2-.9 2-2h-4a2 2 0 002 2zm6-4V9a7 7 0 10-14 0v7l-1 1v1h16v-1l-1-1zm-2 .5H7V9a4 4 0 118 0v7.5z" fill="#444"/>
       </svg>
       </button>
-      <style>
-        .dashboard-sidebar {
-          transition: width 0.55s cubic-bezier(.4,1.4,.6,1), box-shadow 0.55s cubic-bezier(.4,1.4,.6,1), background 0.55s cubic-bezier(.4,1.4,.6,1);
-          border: none !important;
-          box-shadow: none !important;
-          position: relative;
-        }
-        .dashboard-sidebar:hover,
-        .dashboard-sidebar:focus-within {
-          transition: width 0.55s cubic-bezier(.4,1.4,.6,1), box-shadow 0.55s cubic-bezier(.4,1.4,.6,1), background 0.55s cubic-bezier(.4,1.4,.6,1);
-          border: none !important;
-          box-shadow: none !important;
-        }
-        .dashboard-sidebar button,
-        .dashboard-sidebar button span {
-          transition: 
-            width 0.55s cubic-bezier(.4,1.4,.6,1), 
-            min-width 0.55s cubic-bezier(.4,1.4,.6,1), 
-            max-width 0.55s cubic-bezier(.4,1.4,.6,1), 
-            gap 0.55s cubic-bezier(.4,1.4,.6,1), 
-            padding-left 0.55s cubic-bezier(.4,1.4,.6,1), 
-            background 0.35s cubic-bezier(.4,1.4,.6,1), 
-            color 0.35s cubic-bezier(.4,1.4,.6,1), 
-            margin-left 0.55s cubic-bezier(.4,1.4,.6,1);
-        }
-        /* Hide icons by default, show only the line */
-        .dashboard-sidebar button svg {
-          display: none !important;
-          border: none !important;
-          box-shadow: none !important;
-        }
-        /* Vertical line at the center of the sidebar */
-        .dashboard-sidebar::after {
-          content: '';
-          display: block;
-          width: 2px;
-          height: 80%;
-          background: #e0e0e0;
-          position: absolute;
-          left: 50%;
-          top: 10%;
-          border-radius: 1px;
-          transition: background 0.3s;
-          z-index: 1;
-          pointer-events: none;
-        }
-        .dashboard-sidebar:hover::after,
-        .dashboard-sidebar:focus-within::after {
-          background: #007bff;
-        }
-      </style>
       <script>
       // Add bell ring animation on click
       (function() {
@@ -738,207 +575,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-<!-- Fix dashboard sidebar vertical line to be truly full height -->
-<style>
-  /* Sidebar vertical line: full height of viewport, at far left of screen */
-  .dashboard-sidebar::after {
-    content: '';
-    display: block;
-    width: 3px;
-    height: 100vh;
-    background: #007bff; /* blue line */
-    position: absolute;
-    left: 0;
-    top: 0;
-    border-radius: 2px;
-    transition: background 0.4s cubic-bezier(.4,1.4,.6,1), height 0.4s cubic-bezier(.4,1.4,.6,1);
-    z-index: 101;
-    pointer-events: none;
-    box-shadow: 0 0 8px 0 #007bff;
-  }
-  .dashboard-sidebar {
-    min-height: 100vh;
-    height: 100vh;
-    transition: width 0.4s cubic-bezier(.4,1.4,.6,1), min-width 0.4s cubic-bezier(.4,1.4,.6,1), max-width 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1), background 0.4s cubic-bezier(.4,1.4,.6,1);
-    background: #f3f4f7; /* changed from #1a2233 to a light grey */
-    box-shadow: 2px 0 16px 0 rgba(34,44,56,0.18), 0 0 0 1px #e0e0e0;
-    border-right: 1.5px solid #e0e0e0;
-    position: relative;
-    z-index: 10;
-  }
-  .dashboard-sidebar:hover,
-  .dashboard-sidebar:focus-within {
-    background: #232f47;
-    box-shadow: 4px 0 24px 0 rgba(34,44,56,0.28), 0 0 0 1.5px #007bff;
-    transition: background 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1);
-  }
-  .dashboard-sidebar button,
-  .dashboard-sidebar button span {
-    transition: 
-      width 0.4s cubic-bezier(.4,1.4,.6,1), 
-      min-width 0.4s cubic-bezier(.4,1.4,.6,1), 
-      max-width 0.4s cubic-bezier(.4,1.4,.6,1), 
-      gap 0.4s cubic-bezier(.4,1.4,.6,1), 
-      padding-left 0.4s cubic-bezier(.4,1.4,.6,1), 
-      background 0.4s cubic-bezier(.4,1.4,.6,1), 
-      color 0.4s cubic-bezier(.4,1.4,.6,1), 
-      margin-left 0.4s cubic-bezier(.4,1.4,.6,1);
-  }
-  .dashboard-sidebar button {
-    background: none;
-    color: #222c38;
-    position: relative;
-    overflow: visible;
-  }
-  .dashboard-sidebar button:hover {
-    background: #e9e9e9;
-    color: #007bff;
-  }
-  .dashboard-sidebar:hover::after,
-  .dashboard-sidebar:focus-within::after {
-    background: #007bff;
-    box-shadow: 0 0 16px 0 #007bff;
-    transition: background 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1);
-  }
-  /* Smoothly transition calendar-app width when sidebar expands/collapses */
-  .app-container {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-  }
-  .calendar-app {
-    flex: 2;
-    min-width: 0;
-    transition: margin-left 0.4s cubic-bezier(.4,1.4,.6,1);
-    /* margin-left matches sidebar width for smooth effect */
-    margin-left: 48px;
-  }
-  .dashboard-sidebar:hover ~ .calendar-app,
-  .dashboard-sidebar:focus-within ~ .calendar-app {
-    margin-left: 180px;
-  }
-  @media (max-width: 600px) {
-    .dashboard-sidebar::after {
-      left: 0;
-    }
-    .dashboard-sidebar {
-      min-height: 100vh;
-      height: 100vh;
-    }
-    .calendar-app {
-      margin-left: 48px;
-      transition: margin-left 0.4s cubic-bezier(.4,1.4,.6,1);
-    }
-    .dashboard-sidebar:hover ~ .calendar-app,
-    .dashboard-sidebar:focus-within ~ .calendar-app {
-      margin-left: 140px;
-    }
-  }
-  /* Dark mode: sidebar gets even darker and more contrast */
-  body.dark-mode .dashboard-sidebar {
-    background: #10141f;
-    box-shadow: 2px 0 24px 0 #000, 0 0 0 1.5px #232f47;
-    border-right: 1.5px solid #232f47;
-    transition: background 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1);
-  }
-  body.dark-mode .dashboard-sidebar:hover,
-  body.dark-mode .dashboard-sidebar:focus-within {
-    background: #18203a;
-    box-shadow: 4px 0 32px 0 #007bff, 0 0 0 2px #007bff;
-    transition: background 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1);
-  }
-  body.dark-mode .dashboard-sidebar button {
-    color: #c8d4ee;
-  }
-  body.dark-mode .dashboard-sidebar button:hover {
-    background: #232f47;
-    color: #fff;
-  }
-
-  /* --- ICON FADE-IN EFFECT --- */
-  .dashboard-sidebar button {
-    position: relative;
-    padding-left: 44px !important; /* Reserve space for icon, prevents snapping */
-  }
-  .dashboard-sidebar button .sidebar-fade-icon {
-    opacity: 0;
-    transform: scale(0.92);
-    transition: 
-      opacity 0.32s cubic-bezier(.4,1.4,.6,1) 0.12s, 
-      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.12s;
-    pointer-events: none;
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%) scale(0.92);
-    transform-origin: left center;
-    width: 22px;
-    height: 22px;
-    display: block;
-  }
-  .dashboard-sidebar:hover button .sidebar-fade-icon,
-  .dashboard-sidebar:focus-within button .sidebar-fade-icon {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
-    pointer-events: auto;
-    transition-delay: 0.12s;
-  }
-  /* Hide the default SVGs in the button until hover */
-  .dashboard-sidebar button > svg:not(.sidebar-fade-icon) {
-    display: none !important;
-  }
-  /* Ensure fade-in icons are always visible for animation */
-  .dashboard-sidebar button .sidebar-fade-icon {
-    display: block !important;
-  }
-</style>
-<script>
-  // Add fade-in icons to each dashboard button after DOMContentLoaded
-  document.addEventListener('DOMContentLoaded', function() {
-    const icons = [
-      // Home
-      `<svg class="sidebar-fade-icon" viewBox="0 0 22 22" fill="none"><path d="M3 11L11 4l8 7v7a2 2 0 0 1-2 2h-3v-5H8v5H5a2 2 0 0 1-2-2v-7z" stroke="#007bff" stroke-width="2" fill="none"/></svg>`,
-      // Calendar
-      `<svg class="sidebar-fade-icon" viewBox="0 0 22 22" fill="none"><rect x="3" y="5" width="16" height="13" rx="2" stroke="#007bff" stroke-width="2" fill="none"/><path d="M3 8.5h16" stroke="#007bff" stroke-width="2"/></svg>`,
-      // Tasks
-      `<svg class="sidebar-fade-icon" viewBox="0 0 22 22" fill="none"><rect x="5" y="5" width="12" height="12" rx="2" stroke="#007bff" stroke-width="2" fill="none"/><path d="M8 11h6M8 14h4" stroke="#007bff" stroke-width="2" stroke-linecap="round"/></svg>`,
-      // Settings
-      `<svg class="sidebar-fade-icon" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="4" stroke="#007bff" stroke-width="2" fill="none"/><path d="M11 2v2M11 18v2M4.22 4.22l1.42 1.42M16.36 16.36l1.42 1.42M2 11h2M18 11h2M4.22 17.78l1.42-1.42M16.36 5.64l1.42-1.42" stroke="#007bff" stroke-width="2"/></svg>`
-    ];
-    const sidebar = document.querySelector('.dashboard-sidebar');
-    if (!sidebar) return;
-    const buttons = sidebar.querySelectorAll('button');
-    buttons.forEach((btn, i) => {
-      // Only add if not already present
-      if (!btn.querySelector('.sidebar-fade-icon') && icons[i]) {
-        btn.insertAdjacentHTML('afterbegin', icons[i]);
-      }
-    });
-  });
-</script>
-<style>
-  /* Fix: Remove unwanted hover background at top of sidebar */
-  .dashboard-sidebar {
-    background: #f3f4f7 !important;
-  }
-  .dashboard-sidebar:hover,
-  .dashboard-sidebar:focus-within {
-    background: #f3f4f2 !important;
-  }
-  /* Remove outline on hover/focus for sidebar */
-  .dashboard-sidebar:focus {
-    outline: none;
-  }
-  /* Hide fade-in icon when not hovering/focused */
-  .dashboard-sidebar button .sidebar-fade-icon {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.32s cubic-bezier(.4,1.4,.6,1) 0.12s;
-  }
-  .dashboard-sidebar:hover button .sidebar-fade-icon,
-  .dashboard-sidebar:focus-within button .sidebar-fade-icon {
-    opacity: 1;
-    pointer-events: auto;
-    transition-delay: 0.12s;
-  }
-</style>

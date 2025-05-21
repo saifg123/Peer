@@ -510,13 +510,10 @@ animate();
 
 
 
-  /*
-  Fix: Remove lingering drop-bounce classes before re-adding for new drop.
-  This ensures the animation doesn't keep playing after drop.
-  */
-  calendarEl.querySelectorAll(".note-banner.drop-bounce").forEach(b => {
-    b.classList.remove("drop-bounce");
-  });
+
+calendarEl.addEventListener("dragend", (e) => {
+  document.querySelectorAll(".note-banner.dragging").forEach(b => b.classList.remove("dragging"));
+});
 // Add drag & drop listeners
 
 
@@ -589,25 +586,32 @@ calendarEl.addEventListener("drop", e => {
   draggedNoteKey = null;
 
   animate();  // re-render calendar immediately
+  calendarEl.addEventListener("drop", e => {
+  e.preventDefault();
+  const cell = e.target.closest(".day-cell, .week-cell, .month-cell");
+  if (!cell || !draggedNoteKey) return;
+
+  const newKey = cell.dataset.date;
+  if (!newKey || newKey === draggedNoteKey) return;
+
+  // move the note
+  notes[newKey] = notes[draggedNoteKey];
+  delete notes[draggedNoteKey];
+  draggedNoteKey = null;
+
+  animate();  // re-render calendar immediately
 
   // Trigger bounce animation on the new note
   requestAnimationFrame(() => {
     const note = cell.querySelector(`[data-note-key="${newKey}"]`);
     if (note) {
-      note.classList.remove("drop-bounce"); // Clear any old state first
-      void note.offsetWidth; // Force reflow to restart animation
       note.classList.add("drop-bounce");
-
-      // Ensure the class gets removed when the animation ends
-      note.addEventListener("animationend", () => {
-        note.classList.remove("drop-bounce");
-      }, { once: true });
+      setTimeout(() => note.classList.remove("drop-bounce"), 320);
     }
   });
 });
 
-
-
+});
 
 document.getElementById("toggle-dark-mode").addEventListener("click", () => {
   document.body.classList.toggle("dark-mode");
