@@ -1,0 +1,135 @@
+/* Base */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f9f9f9;
+    color: #333;
+  }
+  .calendar-app {
+    max-width: 900px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  
+  /* Controls */
+  #calendar-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f1f1f1;
+    border-bottom: 1px solid #ddd;
+  }
+  #calendar-controls button {
+    font-size: 1.2em;
+    padding: 6px 10px;
+    background: #007aff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  #calendar-controls button:hover {
+    background: #005ec2;
+  }
+  #view-label {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin: 0 10px;
+  }
+  
+  /* Transition */
+  .calendar-view {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .calendar-view.transitioning {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  
+  /* Multi-month grid */
+  .multi-month-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  /* Month tile */
+  .month-tile {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .month-title {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .month-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: center;
+    color: #555;
+    margin-bottom: 4px;
+  }
+  .month-days {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    text-align: center;
+  }
+  .day {
+    padding: 4px 0;
+    font-size: 0.85em;
+  }
+  .empty { visibility: hidden; }
+  
+  /* Summer decoration */
+  .month-tile.summer {
+    border-color: #ffbb33;
+  }
+  .summer-decoration {
+    position: absolute;
+    left: 0; right: 0; bottom: 6px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    pointer-events: none;
+    animation: springUp 0.8s ease-out;
+  }
+  .grass {
+    flex: 1;
+    height: 10px;
+    background: linear-gradient(to top, #81c784 30%, transparent 30%);
+    border-top: 2px solid #4caf50;
+  }
+  .flower {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    position: absolute; bottom: 10px;
+  }
+  .flower1 { background: pink; left: 20%; animation: springUp 0.6s ease-out; }
+  .flower2 { background: yellow; right: 20%; animation: springUp 0.7s ease-out; }
+  
+  @keyframes springUp {
+    0%   { transform: translateY(100%) scaleY(0.2); opacity: 0; }
+    70%  { transform: translateY(-10%) scaleY(1.1); opacity: 1; }
+    100% { transform: translateY(0) scaleY(1); }
+  }
+  
+  /* Day & Week & Semester & Quarter styling omitted for brevity—
+     same as earlier grids, see previous version */
+  
+  

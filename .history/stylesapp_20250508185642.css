@@ -1,0 +1,209 @@
+/* Base */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f9f9f9;
+    color: #333;
+  }
+  .calendar-app {
+    max-width: 900px;
+    margin: 20px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  
+  /* Controls */
+  #calendar-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px;
+    background: #f1f1f1;
+    border-bottom: 1px solid #ddd;
+  }
+  #calendar-controls button {
+    font-size: 1.2em;
+    padding: 6px 10px;
+    background: #e0e0e0;
+    color: #333;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  #calendar-controls button:hover {
+    background: #d0d0d0;
+  }
+  #view-label {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin: 0 10px;
+  }
+  
+  /* Transition wrapper */
+  .calendar-view {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .calendar-view.transitioning {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  
+  /* ========== DAY VIEW ========== */
+  .day-header {
+    text-align: center;
+    font-weight: bold;
+    background: #f9f9f9;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+  }
+  .day-grid {
+    display: grid;
+    grid-template-rows: repeat(24, 40px);
+  }
+  .day-cell {
+    border-top: 1px solid #eee;
+    padding-left: 50px;
+    position: relative;
+  }
+  .day-cell span {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 12px;
+    color: #888;
+  }
+  
+  /* ========== WEEK VIEW ========== */
+  .week-grid {
+    display: flex;
+    flex-direction: column;
+  }
+  .week-labels {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #fafafa;
+    border-bottom: 1px solid #ccc;
+  }
+  .week-label {
+    text-align: center;
+    padding: 8px 0;
+    font-weight: bold;
+  }
+  .week-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    height: 40px;
+  }
+  .week-cell {
+    border: 1px solid #eee;
+  }
+  
+  /* ========== MONTH VIEW ========== */
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-top: 1px solid #ccc;
+  }
+  .month-labels {
+    display: contents;
+  }
+  .month-label {
+    text-align: center;
+    font-weight: bold;
+    padding: 8px 0;
+    border-bottom: 1px solid #ccc;
+  }
+  .month-row {
+    display: contents;
+  }
+  .month-cell {
+    border: 1px solid #eee;
+    height: 80px;
+    padding: 6px;
+    text-align: right;
+    vertical-align: top;
+  }
+  .month-cell.empty {
+    background: #f9f9f9;
+    color: #ccc;
+  }
+  
+  /* ========== MULTI‐MONTH (Quarter/Semester/Year) ========== */
+  .multi-month-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  .month-tile {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .month-title {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .month-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: center;
+    color: #555;
+    margin-bottom: 4px;
+  }
+  .month-days {
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    text-align: center;
+  }
+  .day {
+    padding: 4px 0;
+    font-size: 0.85em;
+  }
+  .empty { visibility: hidden; }
+  
+  /* Summer decoration */
+  .month-tile.summer {
+    border-color: #ffbb33;
+  }
+  .summer-decoration {
+    position: absolute;
+    left: 0; right: 0; bottom: 6px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    pointer-events: none;
+    animation: springUp 0.8s ease-out;
+  }
+  .grass {
+    flex: 1;
+    height: 10px;
+    background: linear-gradient(to top, #81c784 30%, transparent 30%);
+    border-top: 2px solid #4caf50;
+  }
+  .flower {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    position: absolute; bottom: 10px;
+  }
+  .flower1 { background: pink; left: 20%; animation: springUp 0.6s ease-out; }
+  .flower2 { background: yellow; right: 20%; animation: springUp 0.7s ease-out; }
+  @keyframes springUp {
+    0%   { transform: translateY(100%) scaleY(0.2); opacity: 0; }
+    70%  { transform: translateY(-10%) scaleY(1.1); opacity: 1; }
+    100% { transform: translateY(0)    scaleY(1);   }
+  }
+  
+  

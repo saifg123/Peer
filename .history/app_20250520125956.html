@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Peer Calendar</title>
+  <link rel="stylesheet" href="stylesapp.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Calendar Panel -->
+    <div class="calendar-app">
+      <div id="calendar-controls">
+        <!-- your existing controls -->
+        <button id="prev">&larr;</button>
+        <div id="view-label">Month</div>
+        <button id="next">&rarr;</button>
+        <button id="zoom-out">−</button>
+        <button id="zoom-in">+</button>
+        <input id="event-search" placeholder="Search…"/>
+
+      </div>
+<div id="calendar-view"></div>
+<!-- The calendar grid and its cells will be generated dynamically in the #calendar div below -->
+<div id="calendar"></div>
+    </div>
+<div id="event-modal" class="hidden">
+  <!-- Inside your modal -->
+<textarea id="event-modal-text" placeholder="Add a note..." rows="6"></textarea>
+  <div id="event-modal-content">
+    <div id="event-modal-header">
+      <span id="event-modal-date"></span>
+      <button id="event-modal-close">&times;</button>
+    </div>
+    <textarea id="event-modal-text" placeholder="Add a note..."></textarea>
+    <button id="event-modal-save">Save</button>
+  </div>
+</div>
+
+
+    <!-- Chat Panel (unchanged) -->
+    <div class="chatbox">
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Type a message…" />
+        <button id="chat-send">Send</button>
+        <style>
+          .app-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+          }
+          .calendar-app {
+            flex: 2;
+            min-width: 0;
+          }
+          .chatbox {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            margin-left: 24px;
+            background: #fafafa;
+            border-left: 1px solid #e0e0e0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+          }
+          .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+          .chat-message {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            margin-bottom: 4px;
+            word-break: break-word;
+            display: inline-block;
+            clear: both;
+          }
+          .chat-message.sent {
+            align-self: flex-end;
+            background: #007bff;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 16px;
+          }
+          .chat-message.received {
+            align-self: flex-start;
+            background: #e4e6eb;
+            color: #222;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 16px;
+          }
+          .chat-input-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+          }
+          #chat-input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+          }
+          #chat-send {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+          }
+          #chat-send:hover {
+            background-color: #0056b3;
+          }
+        </style>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

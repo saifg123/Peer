@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Peer Calendar</title>
+  <link rel="stylesheet" href="stylesapp.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Calendar Panel -->
+    <div class="calendar-app">
+      <div id="calendar-controls">
+        <!-- your existing controls -->
+        <button id="prev">&larr;</button>
+        <div id="view-label">Month</div>
+        <button id="next">&rarr;</button>
+        <button id="zoom-out">−</button>
+        <button id="zoom-in">+</button>
+      </div>
+      <div id="calendar"></div>
+    </div>
+
+
+    <!-- Chat Panel (unchanged) -->
+    <div class="chatbox">
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Type a message…" />
+        <button id="chat-send">Send</button>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

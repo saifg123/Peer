@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peer Calendar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="stylesapp.css" />
+  <style>
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .app-logo {
+      height: 40px;
+    }
+
+    .header-center-text {
+      font-family: 'Righteous', sans-serif;
+      font-size: 20px;
+      font-weight: bold;
+      flex-grow: 1;
+      text-align: center;
+      color: #333;
+    }
+
+    .profile-icon {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .calendar-app {
+      flex: 2;
+      min-width: 0;
+    }
+
+    .chatbox {
+      flex: 1;
+      min-width: 300px;
+      max-width: 400px;
+      margin-left: 24px;
+      background: #fafafa;
+      border-left: 1px solid #e0e0e0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-message {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      margin-bottom: 4px;
+      word-break: break-word;
+      display: inline-block;
+      clear: both;
+    }
+
+    .chat-message.sent {
+      align-self: flex-end;
+      background: #007bff;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+      border-bottom-left-radius: 16px;
+    }
+
+    .chat-message.received {
+      align-self: flex-start;
+      background: #e4e6eb;
+      color: #222;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 16px;
+    }
+
+    .chat-input-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background-color: #f1f1f1;
+    }
+
+    #chat-input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    #chat-send {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #chat-send:hover {
+      background-color: #0056b3;
+    }
+
+    body.dark-mode {
+      background-color: #121212;
+      color: #000000;
+    }
+
+    body.dark-mode .chatbox {
+      background-color: #1e1e1e;
+      border-left: 1px solid #333;
+    }
+
+    body.dark-mode .chat-message.sent {
+      background-color: #4a90e2;
+    }
+
+    body.dark-mode .chat-message.received {
+      background-color: #2a2a2a;
+    }
+
+    body.dark-mode .chat-input-area {
+      background-color: #1e1e1e;
+    }
+
+    body.dark-mode input,
+    body.dark-mode textarea {
+      background-color: #333;
+      color: #f1eaea;
+      border: 1px solid #555;
+    }
+
+    body.dark-mode .app-header {
+      background-color: #292626;
+      border-bottom: 1px solid #333;
+    }
+
+    body.dark-mode .header-center-text {
+      color: #ffffff;
+    }
+    
+    
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <img src="logo.png" alt="Logo" class="app-logo" />
+    <div class="header-center-text">Peer Calendar</div>
+     <img src="profile.jpg" alt="Profile" class="profile-icon" />
+
+  </header>
+  <footer id="dynamic-footer" style="position:fixed;left:0;right:0;bottom:0;width:100%;background:#222;color:#fff;text-align:center;padding:2px 0;height:20px;transition:height 0.3s, padding 0.3s, font-size 0.3s;font-size:10px;z-index:150;"></footer>
+    Peer Calendar &copy; 2024
+  </footer>
+  <script>
+    (function() {
+      const footer = document.getElementById('dynamic-footer');
+      function adjustFooter() {
+        const scrollY = window.scrollY || window.pageYOffset;
+        // Tiny at first: min height 16px, max 48px
+        const minH = 16, maxH = 48;
+        const minPad = 2, maxPad = 12;
+        // Scale height/padding with scroll, up to 600px scroll
+        const factor = Math.min(scrollY / 600, 1);
+        const height = minH + (maxH - minH) * factor;
+        const pad = minPad + (maxPad - minPad) * factor;
+        footer.style.height = height + "px";
+        footer.style.paddingTop = pad + "px";
+        footer.style.paddingBottom = pad + "px";
+        footer.style.fontSize = (10 + 6 * factor) + "px";
+      }
+      window.addEventListener('scroll', adjustFooter);
+      adjustFooter();
+    })();
+  </script>
+  <!-- Add dummy content to make the page longer for scrolling -->
+  <div style="height: 1800px; background: linear-gradient(to bottom, transparent 0%, #f7f7f7 100%); pointer-events: none; position: absolute; left: 0; right: 0; z-index: 0;"></div>
+  <div class="app-container">
+    <!-- Calendar Panel -->
+    <div class="calendar-app">
+      <div id="calendar-controls">
+      <button type="button" id="prev" style="display:none;">&larr;</button>
+      <button type="button" id="notification-btn" title="Notifications" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">
+        <!-- Custom SVG bell icon -->
+        <svg id="custom-bell-icon" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" focusable="false" style="display:block;cursor:pointer;" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 20c1.1 0 2-.9 2-2h-4a2 2 0 002 2zm6-4V9a7 7 0 10-14 0v7l-1 1v1h16v-1l-1-1zm-2 .5H7V9a4 4 0 118 0v7.5z" fill="#444"/>
+        </svg>
+      </button>
+      <script>
+        // Show #prev button only when footer is maximized
+        (function() {
+          const prevBtn = document.getElementById('prev');
+          const footer = document.getElementById('dynamic-footer');
+          function checkFooter() {
+            // Footer is maximized if height is close to 48px (allow small margin)
+            const h = parseFloat(getComputedStyle(footer).height);
+            if (h >= 46) {
+              prevBtn.style.display = '';
+            } else {
+              prevBtn.style.display = 'none';
+            }
+          }
+          window.addEventListener('scroll', checkFooter);
+          // Initial check
+          checkFooter();
+        })();
+
+        // Add zoom-in transition to About Us button, size matches maximized footer
+        (function() {
+          const footer = document.getElementById('dynamic-footer');
+          let aboutBtn = null;
+          function updateAboutBtn() {
+            const h = parseFloat(getComputedStyle(footer).height);
+            const padTop = parseFloat(getComputedStyle(footer).paddingTop);
+            const padBot = parseFloat(getComputedStyle(footer).paddingBottom);
+            const fontSize = getComputedStyle(footer).fontSize;
+            if (h >= 46) {
+              if (!aboutBtn) {
+                aboutBtn = document.createElement('button');
+                aboutBtn.id = 'about-us-btn';
+                aboutBtn.textContent = 'About Us';
+                aboutBtn.style.cssText = `
+                  margin-left:12px;
+                  background:#444;
+                  color:#fff;
+                  border:none;
+                  border-radius:4px;
+                  cursor:pointer;
+                  transition:transform 0.22s cubic-bezier(.4,1.4,.6,1), opacity 0.18s, height 0.22s, padding 0.22s, font-size 0.22s;
+                  transform:scale(0.85);
+                  opacity:0;
+                  vertical-align:middle;
+                  display:inline-block;
+                `;
+                aboutBtn.onclick = function() {
+                  alert('Peer Calendar\n\nA collaborative calendar and chat app.\n\nCreated by your team, 2024.');
+                };
+                footer.appendChild(aboutBtn);
+                // Force reflow and animate in
+                void aboutBtn.offsetWidth;
+                aboutBtn.style.transform = 'scale(1)';
+                aboutBtn.style.opacity = '1';
+              }
+              // Always update About Us button size to match footer
+              aboutBtn.style.height = h + 'px';
+              aboutBtn.style.paddingTop = padTop + 'px';
+              aboutBtn.style.paddingBottom = padBot + 'px';
+              aboutBtn.style.fontSize = fontSize;
+              aboutBtn.style.lineHeight = (h - padTop - padBot) + 'px';
+              aboutBtn.style.paddingLeft = '18px';
+              aboutBtn.style.paddingRight = '18px';
+            } else {
+              if (aboutBtn && aboutBtn.parentNode) {
+                // Animate out, then remove
+                aboutBtn.style.transform = 'scale(0.85)';
+                aboutBtn.style.opacity = '0';
+                setTimeout(() => {
+                  if (aboutBtn && aboutBtn.parentNode) {
+                    aboutBtn.parentNode.removeChild(aboutBtn);
+                    aboutBtn = null;
+                  }
+                }, 180);
+              }
+            }
+          }
+          window.addEventListener('scroll', updateAboutBtn);
+          // Initial check
+          updateAboutBtn();
+        })();
+
+        // Fade in footer as you scroll down
+        (function() {
+          const footer = document.getElementById('dynamic-footer');
+          footer.style.transition = (footer.style.transition ? footer.style.transition + ',' : '') + ' opacity 0.3s';
+          function updateFooterOpacity() {
+            // Fade in from scrollY 0 to 120px
+            const y = window.scrollY || window.pageYOffset;
+            let opacity = Math.min(Math.max((y - 0) / 120, 0), 1);
+            footer.style.opacity = opacity;
+            // Hide pointer events when invisible
+            footer.style.pointerEvents = opacity > 0 ? '' : 'none';
+          }
+          window.addEventListener('scroll', updateFooterOpacity);
+          // Initial state
+          updateFooterOpacity();
+        })();
+
+        // Move the event search textbox up in the page
+        (function() {
+          // Move #event-search before #notification-btn
+          const search = document.getElementById('event-search');
+          const notifBtn = document.getElementById('notification-btn');
+          if (search && notifBtn && notifBtn.parentNode) {
+            notifBtn.parentNode.insertBefore(search, notifBtn);
+          }
+        })();
+      </script>
+      <div id="view-label">Month</div>
+      <button type="button" id="next">&rarr;</button>
+      <button type="button" id="zoom-out">−</button>
+      <button type="button" id="zoom-in">+</button>
+      <input id="event-search" placeholder="Search…" />
+      <div id="notification-center" style="display:none; position:absolute; left:30px; top:70px; width:300px; background:#fff; border:1px solid #ccc; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.15); z-index:200;">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 16px; border-bottom:1px solid #eee;">
+      <span style="font-weight:bold;">Notifications</span>
+      <button type="button" id="close-notification-center" style="background:none;border:none;font-size:18px;cursor:pointer;">&times;</button>
+      </div>
+      <div style="padding:16px; color:#666;">No notifications.</div>
+      </div>
+      <script>
+      // Make notification center draggable
+
+      // Add zoom-in/out animation to notification center
+      (function() {
+      const notifCenter = document.getElementById('notification-center');
+      notifCenter.style.transition = "transform 0.22s cubic-bezier(.4,1.4,.6,1), opacity 0.18s";
+      notifCenter.style.transformOrigin = "top left";
+      notifCenter.style.opacity = "0";
+      notifCenter.style.transform = "scale(0.85)";
+
+      function showNotifCenter() {
+        notifCenter.style.display = "block";
+        // Force reflow for transition
+        void notifCenter.offsetWidth;
+        notifCenter.style.opacity = "1";
+        notifCenter.style.transform = "scale(1)";
+      }
+      function hideNotifCenter() {
+        notifCenter.style.opacity = "0";
+        notifCenter.style.transform = "scale(0.85)";
+        setTimeout(() => {
+        notifCenter.style.display = "none";
+        }, 180);
+      }
+
+      // Patch notification button logic
+      const notifBtn = document.getElementById('notification-btn');
+      const notifClose = document.getElementById('close-notification-center');
+      notifBtn.addEventListener('click', () => {
+        if (notifCenter.style.display === 'none' || notifCenter.style.opacity === "0") {
+        showNotifCenter();
+        } else {
+        hideNotifCenter();
+        }
+      });
+      notifClose.addEventListener('click', hideNotifCenter);
+      document.addEventListener('mousedown', (e) => {
+        if (
+        notifCenter.style.display === 'block' &&
+        !notifCenter.contains(e.target) &&
+        e.target !== notifBtn
+        ) {
+        hideNotifCenter();
+        }
+      });
+      })();
+      (function() {
+      const notifCenter = document.getElementById('notification-center');
+      let isDragging = false, offsetX = 0, offsetY = 0;
+
+      function enableDrag() {
+        // Drag handle is the header bar (first child div)
+        const dragHandle = notifCenter.querySelector('div');
+        if (!dragHandle) return;
+        dragHandle.style.cursor = "move";
+
+        dragHandle.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        const rect = notifCenter.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        document.body.style.userSelect = "none";
+        notifCenter.style.zIndex = 999;
+        });
+
+        document.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+        notifCenter.style.left = (e.clientX - offsetX) + "px";
+        notifCenter.style.top = (e.clientY - offsetY) + "px";
+        notifCenter.style.right = "auto";
+        notifCenter.style.position = "fixed"; // <-- Make sure it's fixed for dragging
+        }
+        });
+
+        document.addEventListener('mouseup', function() {
+        isDragging = false;
+        document.body.style.userSelect = "";
+        });
+      }
+
+      // Enable drag after DOMContentLoaded
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", enableDrag);
+      } else {
+        enableDrag();
+      }
+      })();
+      </script>
+      <button type="button" id="toggle-dark-mode">Dark Mode</button>
+      </div>
+      <div id="calendar-view"></div>
+      <div id="calendar"></div>
+    </div>
+    <!-- Removed duplicate About Us button script to prevent two buttons from appearing -->
+
+    <div id="event-modal" class="hidden">
+      <div id="event-modal-content">
+        <div id="event-modal-header">
+          <span id="event-modal-date"></span>
+          <button type="button" id="event-modal-close">&times;</button>
+        </div>
+        <textarea id="event-modal-text" placeholder="Add a note..."></textarea>
+        <button type="button" id="event-modal-save">Save</button>
+      </div>
+    </div>
+
+    <!-- Chat Panel -->
+    <div class="chatbox">
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Type a message…" />
+        <button type="button" id="chat-send">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
