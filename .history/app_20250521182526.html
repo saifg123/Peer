@@ -629,6 +629,13 @@
         if (search && notifBtn && notifBtn.parentNode) {
         notifBtn.parentNode.insertBefore(search, notifBtn);
         }
+        // Add Note button logic (always opens event modal, even in clock tab)
+        if (addNoteBtn && eventModal) {
+          addNoteBtn.addEventListener('click', function() {
+            // Optionally, set a default date or context for the note here
+            eventModal.classList.remove('hidden');
+          });
+        }
       })();
       </script>
       <div id="view-label">Month</div>
@@ -740,21 +747,23 @@
       d="M19 13a8 8 0 1 1-8-8c0 5 3.5 8 8 8z"
       fill="none"
       stroke="#444"
-      stroke-width="2.2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-        />
-      </svg>
-      </button>
-      </div>
       <div id="calendar-view"></div>
       <div id="calendar"></div>
+      <!-- Add Note button, always visible in calendar-app -->
+      <button id="add-note-btn" type="button" style="position:absolute;top:16px;right:24px;z-index:120;background:#007bff;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-family:'Righteous',sans-serif;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,0.08);cursor:pointer;transition:background 0.18s;">Add Note</button>
     </div>
     <!-- Removed duplicate About Us button script to prevent two buttons from appearing -->
 
     <div id="event-modal" class="hidden">
       <div id="event-modal-content">
         <div id="event-modal-header">
+          <span id="event-modal-date"></span>
+          <button type="button" id="event-modal-close">&times;</button>
+        </div>
+        <textarea id="event-modal-text" placeholder="Add a note..."></textarea>
+        <button type="button" id="event-modal-save">Save</button>
+      </div>
+    </div>
           <span id="event-modal-date"></span>
           <button type="button" id="event-modal-close">&times;</button>
         </div>
@@ -935,14 +944,16 @@
     #analog-clock-canvas {
       max-width: 95vw;
       max-height: 60vw;
-    }
-    #clock-container {
-      min-width: 0;
-      min-height: 300px;
-    }
-  }
-</style>
-<!-- --- CLOCK LOGIC --- -->
+(function() {
+  // Elements
+  const calendarApp = document.querySelector('.calendar-app');
+  const calendarView = document.getElementById('calendar-view');
+  const calendar = document.getElementById('calendar');
+  const calendarControls = document.getElementById('calendar-controls');
+  const addNoteBtn = document.getElementById('add-note-btn');
+  const eventModal = document.getElementById('event-modal');
+  let clockContainer = null;
+  let clockInterval = null;
 <script>
 (function() {
   // Elements
@@ -1041,15 +1052,17 @@
     ctx.moveTo(0, radius * 0.18);
     ctx.lineTo(0, -radius * 0.82);
     ctx.stroke();
-    ctx.restore();
-
-    // Center dot
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(0, 0, radius * 0.07, 0, 2 * Math.PI);
-    ctx.fillStyle = "#007bff";
-    ctx.fill();
-    ctx.restore();
+  function showClock() {
+    // Hide calendar
+    calendar.style.display = 'none';
+    calendarView.style.display = 'none';
+    if (calendarControls) calendarControls.style.display = 'none';
+    // Show Add Note button
+    if (addNoteBtn) addNoteBtn.style.display = '';
+    // Create clock if not exists
+    if (!clockContainer) {
+      clockContainer = document.createElement('div');
+      clockContainer.id = 'clock-container';
   }
 
   function showClock() {
@@ -1138,12 +1151,17 @@
         }
         size = Math.max(size, 220);
 
-        // Only set width/height if changed, and reset transform to avoid cumulative scaling
+        // Prevent cumulative growth: only set width/height if changed
         const newSize = Math.round(size);
         if (canvas.width !== newSize || canvas.height !== newSize) {
           canvas.width = newSize;
           canvas.height = newSize;
+        }
+        // Only set style if changed
+        if (canvas.style.width !== newSize + 'px') {
           canvas.style.width = newSize + 'px';
+        }
+        if (canvas.style.height !== newSize + 'px') {
           canvas.style.height = newSize + 'px';
         }
       }
@@ -1159,14 +1177,16 @@
         ctx.restore();
         // Date
         const now = new Date();
-        document.getElementById('clock-date').textContent = now.toLocaleDateString(undefined, {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-      }
-      updateClock();
-      clockInterval = setInterval(updateClock, 1000);
-      window.addEventListener('resize', function() {
-        // Reset last known size so resize happens
-        lastParentWidth = null;
-        lastParentHeight = null;
+  function hideClock() {
+    if (clockContainer) clockContainer.style.display = 'none';
+    if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+    calendar.style.display = '';
+    calendarView.style.display = '';
+    if (calendarControls) calendarControls.style.display = '';
+    // Show Add Note button
+    if (addNoteBtn) addNoteBtn.style.display = '';
+    window.removeEventListener('resize', null);
+  }
         updateClock();
       });
     }

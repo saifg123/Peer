@@ -633,6 +633,66 @@
       </script>
       <div id="view-label">Month</div>
       <button type="button" id="next">&rarr;</button>
+      <!-- Add Note button for clock view only -->
+      <button type="button" id="clock-add-note" style="display:none; margin-left:16px; background:#007bff; color:#fff; border:none; border-radius:4px; padding:6px 16px; font-size:15px; font-family:'Righteous',sans-serif; cursor:pointer; transition:background 0.18s;">Add Note</button>
+      <script>
+        // Show/hide Add Note button only in clock view
+        (function() {
+          const addNoteBtn = document.getElementById('clock-add-note');
+          // Listen for clock tab activation
+          let clockBtn = null;
+          document.querySelectorAll('.dashboard-sidebar button').forEach(btn => {
+            if (
+              btn.textContent.trim().toLowerCase().includes('clock') ||
+              (btn.querySelector('span') && btn.querySelector('span').textContent.trim().toLowerCase() === 'clock')
+            ) {
+              clockBtn = btn;
+            }
+          });
+          let clockActive = false;
+          if (clockBtn) {
+            clockBtn.addEventListener('click', function() {
+              // Use the same logic as the main clock script: toggle clockActive
+              clockActive = !clockActive;
+              // Show Add Note button only if clock is active
+              addNoteBtn.style.display = clockActive ? '' : 'none';
+            });
+          }
+          // Hide Add Note if any other sidebar button is clicked
+          document.querySelectorAll('.dashboard-sidebar button').forEach(btn => {
+            if (btn !== clockBtn) {
+              btn.addEventListener('click', () => {
+                addNoteBtn.style.display = 'none';
+                clockActive = false;
+              });
+            }
+          });
+          // On page load, ensure Add Note is hidden
+          addNoteBtn.style.display = 'none';
+        })();
+
+        // Add Note modal logic (simple prompt for demo)
+        (function() {
+          const addNoteBtn = document.getElementById('clock-add-note');
+          addNoteBtn.addEventListener('click', function() {
+            let note = prompt('Add a note for the clock view:');
+            if (note && note.trim()) {
+              // Display note below the clock
+              let clockContainer = document.getElementById('clock-container');
+              if (clockContainer) {
+                let noteDiv = clockContainer.querySelector('.clock-note');
+                if (!noteDiv) {
+                  noteDiv = document.createElement('div');
+                  noteDiv.className = 'clock-note';
+                  noteDiv.style.cssText = 'margin-top:24px;padding:12px 18px;background:#f8fafd;border-radius:8px;box-shadow:0 2px 8px rgba(0,123,255,0.08);font-size:1.1em;color:#222;text-align:center;max-width:90%;';
+                  clockContainer.appendChild(noteDiv);
+                }
+                noteDiv.textContent = note;
+              }
+            }
+          });
+        })();
+      </script>
       <button type="button" id="zoom-out">−</button>
       <button type="button" id="zoom-in">+</button>
       <input id="event-search" placeholder="Search…" />
@@ -1138,12 +1198,17 @@
         }
         size = Math.max(size, 220);
 
-        // Only set width/height if changed, and reset transform to avoid cumulative scaling
+        // Prevent cumulative growth: only set width/height if changed
         const newSize = Math.round(size);
         if (canvas.width !== newSize || canvas.height !== newSize) {
           canvas.width = newSize;
           canvas.height = newSize;
+        }
+        // Only set style if changed
+        if (canvas.style.width !== newSize + 'px') {
           canvas.style.width = newSize + 'px';
+        }
+        if (canvas.style.height !== newSize + 'px') {
           canvas.style.height = newSize + 'px';
         }
       }

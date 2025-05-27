@@ -1096,9 +1096,6 @@
         canvas.style.width = size + 'px';
         canvas.style.height = size + 'px';
       }
-
-      // Call resizeCanvas BEFORE appending to DOM or drawing
-      resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
       canvas.style.background = "#f8fafd";
@@ -1118,6 +1115,8 @@
       clockContainer.appendChild(dateEl);
 
       calendarApp.insertBefore(clockContainer, calendarApp.firstChild.nextSibling);
+
+      resizeCanvas();
     }
     clockContainer.style.display = '';
     // Start interval
@@ -1132,20 +1131,18 @@
         const parent = calendarApp;
         let w = parent.clientWidth;
         let h = parent.clientHeight;
+        if (w === lastParentWidth && h === lastParentHeight) return;
+        lastParentWidth = w;
+        lastParentHeight = h;
         let size = Math.min(w, h, 600) * 0.9;
         if (window.innerWidth < 900) {
           size = Math.min(w, h, window.innerWidth, window.innerHeight) * 0.95;
         }
         size = Math.max(size, 220);
-
-        // Only set width/height if changed, and reset transform to avoid cumulative scaling
-        const newSize = Math.round(size);
-        if (canvas.width !== newSize || canvas.height !== newSize) {
-          canvas.width = newSize;
-          canvas.height = newSize;
-          canvas.style.width = newSize + 'px';
-          canvas.style.height = newSize + 'px';
-        }
+        canvas.width = Math.round(size);
+        canvas.height = Math.round(size);
+        canvas.style.width = size + 'px';
+        canvas.style.height = size + 'px';
       }
 
       function updateClock() {

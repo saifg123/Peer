@@ -145,7 +145,10 @@
       transform: translateY(-50%) scale(1);
       transition-delay: 0.12s;
     }
-    /* Removed code that hides SVG icons on hover to keep icons visible */
+    .dashboard-sidebar:hover button > svg:not(.sidebar-fade-icon),
+    .dashboard-sidebar:focus-within button > svg:not(.sidebar-fade-icon) {
+      display: none !important;
+    }
     .chatbox {
       flex: 1;
       min-width: 300px;
@@ -167,126 +170,14 @@
       flex-direction: column;
       gap: 10px;
     }
-    /* Sidebar icon pop-out effect on hover */
-    .dashboard-sidebar:hover button svg,
-    .dashboard-sidebar:focus-within button svg {
-      transform: translateX(8px) scale(1.08);
-      transition: transform 0.28s cubic-bezier(.4,1.4,.6,1);
-    }
-    .dashboard-sidebar button svg {
-      transition: transform 0.28s cubic-bezier(.4,1.4,.6,1);
-      font-family: 'Righteous', sans-serif;
-    }
-    /* Sidebar icon label: animate "coming out" from icon */
-    .dashboard-sidebar button span {
-      opacity: 0;
-      margin-left: 0;
-      transform: translateX(-16px) scale(0.98);
-      display: inline;
-      transition:
-      opacity 0.22s 0.36s,
-      margin-left 0.22s 0.36s,
-      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
-    }
-    .dashboard-sidebar:hover button span,
-    .dashboard-sidebar:focus-within button span {
-      opacity: 1;
-      margin-left: 8px;
-      transform: translateX(0) scale(1);
-      transition:
-      opacity 0.22s 0.36s,
-      margin-left 0.22s 0.36s,
-      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
-    }
-    .dashboard-sidebar:hover button span,
-    .dashboard-sidebar:focus-within button span {
-      opacity: 1;
-      margin-left: 8px;
-      transform: translateX(0) scale(1);
-      transition:
-      opacity 0.22s 0.36s,
-      margin-left 0.22s 0.36s,
-      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
-    }
-    .dashboard-sidebar:not(:hover):not(:focus-within) button span {
-      opacity: 0;
-      margin-left: 0;
-      transform: translateX(-16px) scale(0.98);
-      transition:
-      opacity 0.12s 0s,
-      margin-left 0.12s 0s,
-      transform 0.22s cubic-bezier(.4,1.4,.6,1) 0s;
-    }
-    .dashboard-sidebar button span {
-      display: inline;
-      opacity: 0;
-      margin-left: 0;
-      transform: translateX(-16px) scale(0.98);
-      transition:
-      opacity 0.22s 0.36s,
-      margin-left 0.22s 0.36s,
-      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
-    }
-    .dashboard-sidebar:hover button span,
-    .dashboard-sidebar:focus-within button span {
-      opacity: 1;
-      margin-left: 8px;
-      transform: translateX(0) scale(1);
-      transition:
-      opacity 0.22s 0.36s,
-      margin-left 0.22s 0.36s,
-      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
-    }
-    .dashboard-sidebar:not(:hover):not(:focus-within) button span {
-      opacity: 0;
-      margin-left: 0;
-      transform: translateX(-16px) scale(0.98);
-      transition:
-      opacity 0.12s 0s,
-      margin-left 0.12s 0s,
-      transform 0.22s cubic-bezier(.4,1.4,.6,1) 0s;
-    }
-
-    /* Sidebar icon label: fade in only after sidebar width transition finishes */
-    .dashboard-sidebar button span {
-      opacity: 0;
-      margin-left: 0;
-      font-size: 15px;
-      color: #444;
-      white-space: nowrap;
-      font-family: 'Righteous', sans-serif;
-      transition:
-        opacity 0.22s 0.36s,
-        margin-left 0.22s 0.36s,
-        transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
-      display: inline;
-      transform: translateX(-16px) scale(0.98);
-    }
-    .dashboard-sidebar:hover button span,
-    .dashboard-sidebar:focus-within button span {
-      opacity: 1;
-      margin-left: 8px;
-      transform: translateX(0) scale(1);
-      transition:
-        opacity 0.22s 0.36s,
-        margin-left 0.22s 0.36s,
-        transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
-    }
-    .dashboard-sidebar:not(:hover):not(:focus-within) button span {
-      opacity: 0;
-      margin-left: 0;
-      transform: translateX(-16px) scale(0.98);
-      transition:
-        opacity 0.12s 0s,
-        margin-left 0.12s 0s,
-        transform 0.22s cubic-bezier(.4,1.4,.6,1) 0s;
-    }
-    .dashboard-sidebar button svg {
-      transition: transform 0.28s cubic-bezier(.4,1.4,.6,1);
-    }
-    .dashboard-sidebar:hover button svg,
-    .dashboard-sidebar:focus-within button svg {
-      transform: translateX(14px) scale(1.12);
+    .chat-message {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      margin-bottom: 4px;
+      word-break: break-word;
+      display: inline-block;
+      clear: both;
     }
     .chat-message.sent {
       align-self: flex-end;
@@ -411,34 +302,41 @@
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
           <path d="M4 13L14 5l10 8v9a2 2 0 0 1-2 2h-4v-6h-8v6H6a2 2 0 0 1-2-2v-9z" stroke="#444" stroke-width="2" fill="none"/>
         </svg>
-        <span>Home</span>
       </button>
       <button title="Calendar">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
           <rect x="4" y="7" width="20" height="16" rx="2" stroke="#444" stroke-width="2" fill="none"/>
           <path d="M4 11h20" stroke="#444" stroke-width="2"/>
         </svg>
-        <span style="font-family: 'Righteous', sans-serif;">Calendar</span>
       </button>
-      <!-- Removed redundant sidebar button span style to avoid conflicts -->
       <button title="Tasks">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
           <rect x="6" y="6" width="16" height="16" rx="3" stroke="#444" stroke-width="2" fill="none"/>
           <path d="M10 14h8M10 18h5" stroke="#444" stroke-width="2" stroke-linecap="round"/>
         </svg>
-        <span>Tasks</span>
       </button>
       <button title="Clock">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
           <circle cx="14" cy="14" r="10" stroke="#444" stroke-width="2" fill="none"/>
           <path d="M14 9v5l4 2" stroke="#444" stroke-width="2" stroke-linecap="round"/>
         </svg>
-        <span>Clock</span>
       </button>
       <button title="Settings" style="margin-top:auto;">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false" style="display:block;margin-left:0;margin-right:auto;transition:transform 0.22s cubic-bezier(.4,1.4,.6,1);">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false" style="display:block;margin-left:0;margin-right:auto;transition:transform 0.22s cubic-bezier(.4,1.4,.6,1);"></svg>
           <path d="M13.5 4.5a1 1 0 0 1 1 1V7h2a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h2V9a2 2 0 0 1 2-2h2V5.5a1 1 0 0 1 1-1z" stroke="#444" stroke-width="2" fill="none"/>
         </svg>
+        <style>
+          .dashboard-sidebar {
+            transition: width 0.22s cubic-bezier(.4,1.4,.6,1), box-shadow 0.18s, background 0.22s;
+          .dashboard-sidebar:hover {
+            background: #f5f5f5;
+            transition: background 0.22s cubic-bezier(.4,1.4,.6,1), width 0.22s cubic-bezier(.4,1.4,.6,1), box-shadow 0.18s;
+          }
+          body.dark-mode .dashboard-sidebar:hover {
+            background: #10141f !important;
+          }
+          }
+        </style>
         <span>Settings</span>
       </button>
     </nav>
@@ -476,10 +374,16 @@
             color 0.35s cubic-bezier(.4,1.4,.6,1), 
             margin-left 0.55s cubic-bezier(.4,1.4,.6,1);
         }
-        /* Remove hiding of SVGs on hover so icons remain visible */
-        /* .dashboard-sidebar:hover button > svg:not(.sidebar-fade-icon),
+        /* Hide only the original SVGs, not the fade-in icons, but only when sidebar is hovered/focused */
+        .dashboard-sidebar:hover button > svg:not(.sidebar-fade-icon),
         .dashboard-sidebar:focus-within button > svg:not(.sidebar-fade-icon) {
-        /* Ensure SVG icons always remain visible on hover */
+          display: none !important;
+          border: none !important;
+          box-shadow: none !important;
+        }
+        /* Vertical line at the center of the sidebar */
+        .dashboard-sidebar::after {
+          content: '';
           display: block;
           width: 2px;
           height: 80%;
@@ -797,25 +701,18 @@
   .dashboard-sidebar {
     min-height: 100vh;
     height: 100vh;
-    width: 48px;
-    min-width: 48px;
-    max-width: 48px;
     transition: width 0.4s cubic-bezier(.4,1.4,.6,1), min-width 0.4s cubic-bezier(.4,1.4,.6,1), max-width 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1), background 0.4s cubic-bezier(.4,1.4,.6,1);
     background: #f3f4f7; /* changed from #1a2233 to a light grey */
     box-shadow: 2px 0 16px 0 rgba(34,44,56,0.18), 0 0 0 1px #e0e0e0;
     border-right: 1.5px solid #e0e0e0;
     position: relative;
     z-index: 10;
-    overflow: hidden;
-  }
   .dashboard-sidebar:hover,
   .dashboard-sidebar:focus-within {
     background: #f5f5f5;
     box-shadow: 4px 0 24px 0 rgba(34,44,56,0.28), 0 0 0 1.5px #007bff;
-    width: 180px;
-    min-width: 180px;
-    max-width: 180px;
-    transition: background 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1), width 0.4s cubic-bezier(.4,1.4,.6,1), min-width 0.4s cubic-bezier(.4,1.4,.6,1), max-width 0.4s cubic-bezier(.4,1.4,.6,1);
+    transition: background 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1);
+  }
   }
   .dashboard-sidebar button,
   .dashboard-sidebar button span {
@@ -845,378 +742,8 @@
     box-shadow: 0 0 16px 0 #007bff;
     transition: background 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1);
   }
-  /* Show icon labels when sidebar is expanded (hover or focus) */
-  .dashboard-sidebar button span {
-    opacity: 0;
-    margin-left: 0;
-    font-size: 15px;
-    color: #444;
-    white-space: nowrap;
-    font-family: 'Righteous', sans-serif;
-    display: inline;
-    transform: translateX(-16px) scale(0.98);
-    transition:
-      opacity 0.22s 0.36s,
-      margin-left 0.22s 0.36s,
-      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
-  }
-  .dashboard-sidebar:hover button span,
-  .dashboard-sidebar:focus-within button span {
-    display: inline;
-    opacity: 1;
-    margin-left: 8px;
-  }
-
-  /* Ensure SVG icons are always visible */
-  .dashboard-sidebar button svg {
-    display: block;
-    margin-right: 0;
-    transition: margin 0.22s;
-    vertical-align: middle;
-  }
-  .dashboard-sidebar:hover button span,
-  .dashboard-sidebar:focus-within button span {
-    display: inline;
-    opacity: 1;
-    margin-left: 8px;
-    transform: translateX(0) scale(1);
-    transition:
-      opacity 0.22s 0.36s,
-      margin-left 0.22s 0.36s,
-      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
-  }
-    .dashboard-sidebar:not(:hover):not(:focus-within) button span {
-      opacity: 0;
-      margin-left: 0;
-      transform: translateX(-16px) scale(0.98);
-      transition:
-        opacity 0.12s 0s,
-        margin-left 0.12s 0s,
-        transform 0.22s cubic-bezier(.4,1.4,.6,1) 0s;
-      display: inline;
-    }
-
-  /* Make the clock fill the calendar area */
-  #clock-container {
-    width: 100%;
-    height: 100%;
-    min-height: 500px;
-    min-width: 350px;
+  /* Smoothly transition calendar-app width when sidebar expands/collapses */
+  .app-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-sizing: border-box;
-    position: relative;
-    /* Remove margin-top from JS, handled here */
-  }
-  #analog-clock-canvas {
-    width: 90%;
-    height: auto;
-    max-width: 600px;
-    max-height: 80vh;
-    aspect-ratio: 1/1;
-    background: #f8fafd;
-    border-radius: 50%;
-    box-shadow: 0 4px 32px 0 rgba(0,123,255,0.10);
-    display: block;
-  }
-  #clock-date {
-    font-size: 1.5em;
-    color: #444;
-    margin-top: 32px;
-    font-family: 'Righteous',sans-serif;
-    text-align: center;
-    width: 100%;
-  }
-  @media (max-width: 900px) {
-    #analog-clock-canvas {
-      max-width: 95vw;
-      max-height: 60vw;
-    }
-    #clock-container {
-      min-width: 0;
-      min-height: 300px;
-    }
-  }
-</style>
-<!-- --- CLOCK LOGIC --- -->
-<script>
-(function() {
-  // Elements
-  const calendarApp = document.querySelector('.calendar-app');
-  const calendarView = document.getElementById('calendar-view');
-  const calendar = document.getElementById('calendar');
-  const calendarControls = document.getElementById('calendar-controls');
-  let clockContainer = null;
-  let clockInterval = null;
-
-  function drawAnalogClock(ctx, radius) {
-    ctx.clearRect(-radius - 20, -radius - 20, (radius + 20) * 2, (radius + 20) * 2);
-
-    // Draw face
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = "#fff";
-    ctx.shadowColor = "#007bff";
-    ctx.shadowBlur = 12;
-    ctx.fill();
-    ctx.lineWidth = 6;
-    ctx.strokeStyle = "#007bff";
-    ctx.stroke();
-    ctx.restore();
-
-    // Draw hour marks
-    for (let num = 1; num <= 12; num++) {
-      let ang = num * Math.PI / 6;
-      ctx.save();
-      ctx.rotate(ang);
-      ctx.translate(0, -radius * 0.82);
-      ctx.rotate(-ang);
-      ctx.font = `${radius * 0.22}px Righteous, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "#444";
-      ctx.fillText(num.toString(), 0, 0);
-      ctx.restore();
-    }
-
-    // Draw minute marks
-    ctx.save();
-    ctx.strokeStyle = "#bbb";
-    for (let i = 0; i < 60; i++) {
-      let ang = i * Math.PI / 30;
-      ctx.beginPath();
-      ctx.rotate(ang);
-      ctx.moveTo(0, -radius * 0.95);
-      ctx.lineTo(0, -radius * 0.9);
-      ctx.stroke();
-      ctx.rotate(-ang);
-    }
-    ctx.restore();
-
-    // Get current time
-    const now = new Date();
-    let hour = now.getHours();
-    let minute = now.getMinutes();
-    let second = now.getSeconds();
-
-    // Hour hand
-    ctx.save();
-    ctx.strokeStyle = "#007bff";
-    ctx.lineWidth = radius * 0.09;
-    ctx.lineCap = "round";
-    let hourAngle = ((hour % 12) + minute / 60 + second / 3600) * Math.PI / 6;
-    ctx.rotate(hourAngle);
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, -radius * 0.55);
-    ctx.stroke();
-    ctx.restore();
-
-    // Minute hand
-    ctx.save();
-    ctx.strokeStyle = "#222";
-    ctx.lineWidth = radius * 0.06;
-    ctx.lineCap = "round";
-    let minAngle = (minute + second / 60) * Math.PI / 30;
-    ctx.rotate(minAngle);
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, -radius * 0.75);
-    ctx.stroke();
-    ctx.restore();
-
-    // Second hand
-    ctx.save();
-    ctx.strokeStyle = "#e74c3c";
-    ctx.lineWidth = radius * 0.025;
-    ctx.lineCap = "round";
-    let secAngle = second * Math.PI / 30;
-    ctx.rotate(secAngle);
-    ctx.beginPath();
-    ctx.moveTo(0, radius * 0.18);
-    ctx.lineTo(0, -radius * 0.82);
-    ctx.stroke();
-    ctx.restore();
-
-    // Center dot
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(0, 0, radius * 0.07, 0, 2 * Math.PI);
-    ctx.fillStyle = "#007bff";
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function showClock() {
-    // Hide calendar
-    calendar.style.display = 'none';
-    calendarView.style.display = 'none';
-    if (calendarControls) calendarControls.style.display = 'none';
-    // Create clock if not exists
-    if (!clockContainer) {
-      clockContainer = document.createElement('div');
-      clockContainer.id = 'clock-container';
-
-      // Make clock container fill the calendar-app
-      clockContainer.style.width = '100%';
-      clockContainer.style.height = '100%';
-      clockContainer.style.minHeight = '500px';
-      clockContainer.style.minWidth = '350px';
-      clockContainer.style.display = 'flex';
-      clockContainer.style.flexDirection = 'column';
-      clockContainer.style.alignItems = 'center';
-      clockContainer.style.justifyContent = 'center';
-      clockContainer.style.margin = '0';
-      clockContainer.style.padding = '0';
-      clockContainer.style.boxSizing = 'border-box';
-      clockContainer.style.position = 'relative';
-
-      // Responsive sizing
-      let canvas = document.createElement('canvas');
-      canvas.id = 'analog-clock-canvas';
-      // Set canvas size to match calendar-app size
-      function resizeCanvas() {
-        // Get calendar-app size
-        const parent = calendarApp;
-        let w = parent.clientWidth;
-        let h = parent.clientHeight;
-        // Use the smaller of width/height, minus some padding
-        let size = Math.min(w, h, 600) * 0.9;
-        if (window.innerWidth < 900) {
-          size = Math.min(w, h, window.innerWidth, window.innerHeight) * 0.95;
-        }
-        size = Math.max(size, 220);
-        canvas.width = Math.round(size);
-        canvas.height = Math.round(size);
-        canvas.style.width = size + 'px';
-        canvas.style.height = size + 'px';
-      }
-
-      // Call resizeCanvas BEFORE appending to DOM or drawing
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-
-      canvas.style.background = "#f8fafd";
-      canvas.style.borderRadius = "50%";
-      canvas.style.boxShadow = "0 4px 32px 0 rgba(0,123,255,0.10)";
-      canvas.style.display = "block";
-      clockContainer.appendChild(canvas);
-
-      const dateEl = document.createElement('div');
-      dateEl.id = 'clock-date';
-      dateEl.style.fontSize = '1.5em';
-      dateEl.style.color = '#444';
-      dateEl.style.marginTop = '32px';
-      dateEl.style.fontFamily = "'Righteous',sans-serif";
-      dateEl.style.textAlign = 'center';
-      dateEl.style.width = '100%';
-      clockContainer.appendChild(dateEl);
-
-      calendarApp.insertBefore(clockContainer, calendarApp.firstChild.nextSibling);
-    }
-    clockContainer.style.display = '';
-    // Start interval
-    if (!clockInterval) {
-      // Track last known parent size to avoid repeated resizing
-      let lastParentWidth = null;
-      let lastParentHeight = null;
-
-      function resizeCanvasIfNeeded() {
-        const canvas = document.getElementById('analog-clock-canvas');
-        if (!canvas) return;
-        const parent = calendarApp;
-        let w = parent.clientWidth;
-        let h = parent.clientHeight;
-        let size = Math.min(w, h, 600) * 0.9;
-        if (window.innerWidth < 900) {
-          size = Math.min(w, h, window.innerWidth, window.innerHeight) * 0.95;
-        }
-        size = Math.max(size, 220);
-
-        // Only set width/height if changed, and reset transform to avoid cumulative scaling
-        const newSize = Math.round(size);
-        if (canvas.width !== newSize || canvas.height !== newSize) {
-          canvas.width = newSize;
-          canvas.height = newSize;
-          canvas.style.width = newSize + 'px';
-          canvas.style.height = newSize + 'px';
-        }
-      }
-
-      function updateClock() {
-        resizeCanvasIfNeeded();
-        const canvas = document.getElementById('analog-clock-canvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        ctx.save();
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        drawAnalogClock(ctx, canvas.width / 2 - 12);
-        ctx.restore();
-        // Date
-        const now = new Date();
-        document.getElementById('clock-date').textContent = now.toLocaleDateString(undefined, {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-      }
-      updateClock();
-      clockInterval = setInterval(updateClock, 1000);
-      window.addEventListener('resize', function() {
-        // Reset last known size so resize happens
-        lastParentWidth = null;
-        lastParentHeight = null;
-        updateClock();
-      });
-    }
-  }
-
-  function hideClock() {
-    if (clockContainer) clockContainer.style.display = 'none';
-    if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
-    calendar.style.display = '';
-    calendarView.style.display = '';
-    if (calendarControls) calendarControls.style.display = '';
-    window.removeEventListener('resize', null);
-  }
-
-  // Track state
-  let clockActive = false;
-
-  // Find the "Clock" button in the sidebar
-  let clockBtn = null;
-  document.querySelectorAll('.dashboard-sidebar button').forEach(btn => {
-    if (
-      btn.textContent.trim().toLowerCase().includes('clock') ||
-      (btn.querySelector('span') && btn.querySelector('span').textContent.trim().toLowerCase() === 'clock')
-    ) {
-      clockBtn = btn;
-    }
-  });
-
-  if (clockBtn) {
-    clockBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      clockActive = !clockActive;
-      if (clockActive) {
-        showClock();
-      } else {
-        hideClock();
-      }
-    });
-  }
-
-  // Hide clock if user clicks any other sidebar button
-  document.querySelectorAll('.dashboard-sidebar button').forEach(btn => {
-    if (btn !== clockBtn) {
-      btn.addEventListener('click', () => {
-        if (clockActive) {
-          clockActive = false;
-          hideClock();
-        }
-      });
-    }
-  });
-})();
-</script>
+    flex-direction: row;
+<!-- Sidebar styles are now consolidated in the main <style> block above. Duplicate/overlapping sidebar CSS removed for clarity. -->

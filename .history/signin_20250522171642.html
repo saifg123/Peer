@@ -342,9 +342,9 @@
       }, { merge: true });
 
       const endpoints = [
-        { url: `https://classroom.googleapis.com/v1/courses/${courseId}/announcements`, key: "announcements" },
-        { url: `https://classroom.googleapis.com/v1/courses/${courseId}/courseWork`, key: "courseWork" }
-      ];
+  { url: `https://classroom.googleapis.com/v1/courses/${courseId}/announcements`, key: "announcements" },
+  { url: `https://classroom.googleapis.com/v1/courses/${courseId}/courseWork`, key: "courseWork" }
+];
 
       for (const { url, key } of endpoints) {
         const res = await fetch(url, { headers });
@@ -355,11 +355,9 @@
           continue;
         }
 
-        const firestoreKey = key === "courseWork" ? "assignments" : key;
-
         if (Array.isArray(data[key])) {
           for (const item of data[key]) {
-            await courseRef.collection(firestoreKey).doc(item.id).set(item);
+            await courseRef.collection(key).doc(item.id).set(item);
           }
         }
       }

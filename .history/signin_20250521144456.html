@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign In</title>
-  <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet" />
   <style>
-  body {
+    body {
       margin: 0;
       font-family: 'Righteous', cursive;
       background-color: #f0f0f0;
@@ -182,18 +179,24 @@
     </div>
 
     <div class="input-box">
-      <input id="emailInput" type="text" placeholder="Email" />
+      <input type="text" placeholder="Username" />
     </div>
 
     <div class="input-box password-wrapper">
       <input type="password" id="passwordInput" placeholder="Password" />
       <div class="icon-layer toggle-password" onclick="togglePassword()">
-        <!-- [Eye icons unchanged] -->
         <svg id="eyeOpen" class="icon-visible" viewBox="0 0 24 24" fill="currentColor">
-          <path d="..."/>
+          <path d="M12 5C7 5 2.7 8.1 1 12c1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7zm0 12c-2.8 
+                  0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5zm0-8c-1.7 0-3 1.3-3 3s1.3 3 
+                  3 3 3-1.3 3-3-1.3-3-3-3z" />
         </svg>
         <svg id="eyeClosed" class="icon-hidden" viewBox="0 0 24 24" fill="currentColor">
-          <path d="..."/>
+          <path d="M1 4.27L2.28 3 21 21.72 19.73 23l-2.27-2.27C15.6 21 13.86 21.5 12 
+                  21.5c-5 0-9.3-3.1-11-7 1.1-2.6 3.1-4.7 5.5-6.1L1 4.27zM12 6.5c4.7 0 
+                  8.6 2.8 10 6.5-.5 1.2-1.2 2.3-2.1 3.3l-2.1-2.1c.2-.4.3-.9.3-1.4 
+                  0-2.2-1.8-4-4-4-.5 0-1 .1-1.4.3l-2.1-2.1C10.7 6.6 11.3 6.5 12 6.5zm-3 
+                  3c0 .6.2 1.2.5 1.7l-3.8-3.8c.8-.6 1.8-1.1 2.8-1.4l1.5 1.5c-.3.5-.5 
+                  1-.5 1.7z" />
         </svg>
       </div>
     </div>
@@ -202,7 +205,7 @@
       <a href="#">Forgot password?</a>
     </div>
 
-    <form id="signin-form" onsubmit="handleEmailPasswordSignIn(event)">
+    <form id="signin-form" onsubmit="event.preventDefault();">
       <button type="submit" class="submit-btn">Sign In</button>
     </form>
 
@@ -234,41 +237,13 @@
       }
     }
 
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDgt47saNP2MY1CYZ9DKlMUIBvLODhbSoY",
-      authDomain: "peer-a2a78.firebaseapp.com",
-      projectId: "peer-a2a78",
-      storageBucket: "peer-a2a78.appspot.com",
-      messagingSenderId: "366889068662",
-      appId: "1:366889068662:web:ffa8754a3ce3330396d757",
-      measurementId: "G-98GY2G56G4"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Email/password sign-in
-    async function handleEmailPasswordSignIn(event) {
-      event.preventDefault();
-      const email = document.getElementById("emailInput").value;
-      const password = document.getElementById("passwordInput").value;
-
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        console.log("Signed in with email/password");
-        window.location.href = "app.html";
-      } catch (error) {
-        alert("Sign-in failed: " + error.message);
-        console.error(error);
-      }
+    function handleCredentialResponse(response) {
+      console.log("Google ID token:", response.credential);
     }
 
-    // Google Classroom OAuth2
     async function getAccessToken() {
       return new Promise((resolve, reject) => {
-        const client = google.accounts.oauth2.initTokenClient({
+        google.accounts.oauth2.initTokenClient({
           client_id: '824197230866-ihf2fbgin6f0d4mntooh3mpt6qku7vrc.apps.googleusercontent.com',
           scope: [
             'https://www.googleapis.com/auth/classroom.courses.readonly',
@@ -279,99 +254,57 @@
             'https://www.googleapis.com/auth/classroom.announcements.readonly',
             'https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly',
             'https://www.googleapis.com/auth/classroom.push-notifications',
-            'https://www.googleapis.com/auth/classroom.topics.readonly'
+            'https://www.googleapis.com/auth/classroom.topics.readonly',
           ].join(' '),
-          callback: (tokenResponse) => {
-            if (tokenResponse && tokenResponse.access_token) {
-              resolve(tokenResponse.access_token);
-            } else {
-              reject(new Error("No access token received."));
-            }
-          }
-        });
-
-        client.requestAccessToken();
+          callback: (tokenResponse) => resolve(tokenResponse.access_token)
+        }).requestAccessToken();
       });
     }
 
     async function fetchClassroomData(event) {
-  event.preventDefault();
+      event.preventDefault();
+      const token = await getAccessToken();
+      if (!token) {
+        alert("Please sign in with Google.");
+        return;
+      }
 
-  let token;
-  try {
-    token = await getAccessToken();
-  } catch (err) {
-    alert("Google Sign-In failed: " + err.message);
-    return;
-  }
+      const headers = { Authorization: `Bearer ${token}` };
 
-  const headers = { Authorization: `Bearer ${token}` };
+      const coursesRes = await fetch("https://classroom.googleapis.com/v1/courses", { headers });
+      const coursesData = await coursesRes.json();
 
-  try {
-    // Get user profile from Google
-    const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { headers });
-    const userData = await userInfoRes.json();
+      if (!coursesData.courses || coursesData.courses.length === 0) {
+        console.log("No courses found.");
+        return;
+      }
 
-    // Save user to Firestore
-    const userRef = db.collection("users").doc(userData.sub);  // sub = unique Google ID
-    await userRef.set({
-      email: userData.email,
-      name: userData.name,
-      picture: userData.picture,
-      lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
+      for (const course of coursesData.courses) {
+        const courseId = course.id;
 
-    // Get Google Classroom courses
-    const coursesRes = await fetch("https://classroom.googleapis.com/v1/courses", { headers });
-    const coursesData = await coursesRes.json();
+        const endpoints = [
+          `https://classroom.googleapis.com/v1/courses/${courseId}/announcements`,
+          `https://classroom.googleapis.com/v1/courses/${courseId}/courseWork`
+        ];
 
-    if (!coursesData.courses || coursesData.courses.length === 0) {
-      console.log("No courses found.");
-      return;
-    }
+        for (const url of endpoints) {
+          try {
+            const res = await fetch(url, { headers });
+            if (!res.ok) {
+              console.error(`Error from ${url}:`, await res.text());
+              continue;
+            }
 
-    for (const course of coursesData.courses) {
-      const courseId = course.id;
-      const courseRef = userRef.collection("courses").doc(courseId);
-
-      // Save basic course info
-      await courseRef.set({
-        name: course.name,
-        section: course.section || "",
-        description: course.description || ""
-      }, { merge: true });
-
-      const endpoints = [
-        { url: `https://classroom.googleapis.com/v1/courses/${courseId}/announcements`, key: "announcements" },
-        { url: `https://classroom.googleapis.com/v1/courses/${courseId}/courseWork`, key: "courseWork" }
-      ];
-
-      for (const { url, key } of endpoints) {
-        const res = await fetch(url, { headers });
-        const data = await res.json();
-
-        if (!res.ok) {
-          console.error(`Error from ${url}:`, data);
-          continue;
-        }
-
-        const firestoreKey = key === "courseWork" ? "assignments" : key;
-
-        if (Array.isArray(data[key])) {
-          for (const item of data[key]) {
-            await courseRef.collection(firestoreKey).doc(item.id).set(item);
+            console.log(`Data from ${url}:`, data);
+          } catch (err) {
+            console.error(`Fetch error from ${url}:`, err);
           }
         }
       }
-    }
 
-    // Success: Redirect to app
-    window.location.href = "app.html";
-  } catch (err) {
-    console.error("Error fetching Classroom data:", err);
-    alert("Failed to fetch Google Classroom data.");
-  }
-}
+      // Redirect to app after successful data pull
+      window.location.href = "app.html";
+    }
   </script>
 </body>
 </html>

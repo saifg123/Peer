@@ -527,115 +527,85 @@ animate();
 
 
 // Delegate dragstart from any note-banner
-
-
-function clearDragOver() {
-  document.querySelectorAll('.day-cell.drag-over, .week-cell.drag-over, .month-cell.drag-over')
-    .forEach(cell => cell.classList.remove('drag-over'));
-}
-
-calendarEl.addEventListener('dragstart', e => {
-  const banner = e.target.closest('.note-banner');
+calendarEl.addEventListener("dragstart", e => {
+  const banner = e.target.closest(".note-banner");
   if (!banner) return;
 
   draggedNoteKey = banner.dataset.noteKey;
-  e.dataTransfer.setData('text/plain', draggedNoteKey);
-  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData("text/plain", draggedNoteKey);
+  e.dataTransfer.effectAllowed = "move";
 
-  // build our custom ghost
+  // Clone the element for the visual floating effect
   const ghost = banner.cloneNode(true);
-  ghost.className = 'drag-ghost';              // ← use our CSS class
-  ghost.id = 'drag-ghost';
+  ghost.classList.add("smooth-dragging");
   ghost.style.left = `${e.pageX}px`;
-  ghost.style.top  = `${e.pageY}px`;
+  ghost.style.top = `${e.pageY}px`;
+  ghost.id = "drag-ghost";
   document.body.appendChild(ghost);
 
-  banner.classList.add('dragging');
+  banner.classList.add("dragging");
 
-  // suppress default image
-  e.dataTransfer.setDragImage(new Image(), 0, 0);
+  // Remove browser default drag image
+  const emptyImg = new Image();
+  emptyImg.src = "";
+  e.dataTransfer.setDragImage(emptyImg, 0, 0);
 });
-
-document.addEventListener('dragover', e => {
-  const ghost = document.getElementById('drag-ghost');
+document.addEventListener("dragover", e => {
+  const ghost = document.getElementById("drag-ghost");
   if (ghost) {
     ghost.style.left = `${e.pageX + 10}px`;
-    ghost.style.top  = `${e.pageY + 10}px`;
+    ghost.style.top = `${e.pageY + 10}px`;
   }
+});
 
-  // allow drop only on cells
-  if (e.target.closest('.day-cell, .week-cell, .month-cell')) {
+
+calendarEl.addEventListener("dragend", e => {
+  document.querySelectorAll(".note-banner.dragging")
+    .forEach(b => b.classList.remove("dragging"));
+
+  const ghost = document.getElementById("drag-ghost");
+  if (ghost) ghost.remove();
+});
+
+
+// Allow dropping on any cell
+  calendarEl.addEventListener("dragover", e => {
+    if (e.target.closest(".day-cell, .week-cell, .month-cell")) {
     e.preventDefault();
   }
 });
 
-calendarEl.addEventListener('dragenter', e => {
-  const cell = e.target.closest('.day-cell, .week-cell, .month-cell');
-  if (cell) {
-    cell.classList.add('drag-over');
-  }
-});
-
-calendarEl.addEventListener('dragleave', e => {
-  const cell = e.target.closest('.day-cell, .week-cell, .month-cell');
-  if (cell) {
-    cell.classList.remove('drag-over');
-  }
-});
-
-calendarEl.addEventListener('drop', e => {
+calendarEl.addEventListener("drop", e => {
   e.preventDefault();
-  clearDragOver();
-
-  const cell = e.target.closest('.day-cell, .week-cell, .month-cell');
-  const ghost = document.getElementById('drag-ghost');
-  if (!cell || !draggedNoteKey) {
-    if (ghost) ghost.remove();
-    return;
-  }
+  const cell = e.target.closest(".day-cell, .week-cell, .month-cell");
+  if (!cell || !draggedNoteKey) return;
 
   const newKey = cell.dataset.date;
-  if (!newKey || newKey === draggedNoteKey) {
-    if (ghost) ghost.remove();
-    return;
-  }
+  if (!newKey || newKey === draggedNoteKey) return;
 
-  // move the note in your data
+  // move the note
   notes[newKey] = notes[draggedNoteKey];
   delete notes[draggedNoteKey];
   draggedNoteKey = null;
 
-  animate();  // re-render
+  animate();  // re-render calendar immediately
 
-  // drop‐bounce on new note
+  // Trigger bounce animation on the new note
   requestAnimationFrame(() => {
-    const noteEl = cell.querySelector(`[data-note-key="${newKey}"]`);
-    if (noteEl) {
-      noteEl.classList.remove('drop-bounce');
-      void noteEl.offsetWidth;
-      noteEl.classList.add('drop-bounce');
-      noteEl.addEventListener('animationend', ()=> {
-        noteEl.classList.remove('drop-bounce');
+    const note = cell.querySelector(`[data-note-key="${newKey}"]`);
+    if (note) {
+      // Always remove lingering animation classes first
+      note.classList.remove("drop-bounce");
+      void note.offsetWidth; // Force reflow to restart animation
+      note.classList.add("drop-bounce");
+
+      // Remove the animation class after animation ends
+      note.addEventListener("animationend", () => {
+        note.classList.remove("drop-bounce");
       }, { once: true });
     }
   });
-
-  // fade‐out ghost
-  if (ghost) {
-    ghost.classList.add('dropping');
-    ghost.addEventListener('transitionend', () => ghost.remove(), { once: true });
-  }
 });
-
-document.addEventListener('dragend', () => {
-  draggedNoteKey = null;
-  clearDragOver();
-  document.querySelectorAll('.note-banner.dragging')
-    .forEach(b => b.classList.remove('dragging'));
-  const ghost = document.getElementById('drag-ghost');
-  if (ghost) ghost.remove();
-});
-
 
 
 

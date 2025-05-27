@@ -527,7 +527,7 @@ animate();
 
 
 // Delegate dragstart from any note-banner
-
+let draggedNoteKey = null;
 
 function clearDragOver() {
   document.querySelectorAll('.day-cell.drag-over, .week-cell.drag-over, .month-cell.drag-over')
@@ -603,7 +603,7 @@ calendarEl.addEventListener('drop', e => {
   // move the note in your data
   notes[newKey] = notes[draggedNoteKey];
   delete notes[draggedNoteKey];
-  draggedNoteKey = null;
+  
 
   animate();  // re-render
 

@@ -633,6 +633,164 @@
       </script>
       <div id="view-label">Month</div>
       <button type="button" id="next">&rarr;</button>
+      <button type="button" id="clock-note-btn" title="Add Note to Clock" style="margin-left:8px;">
+        📝 Note
+      </button>
+      <script>
+      // --- Clock Note Button Logic ---
+      (function() {
+        // Create a notes container for the clock if not exists
+        let clockNotes = [];
+        let clockNotesContainer = null;
+        let draggingNote = null;
+        let offsetX = 0, offsetY = 0;
+
+        function ensureClockNotesContainer() {
+          let clockContainer = document.getElementById('clock-container');
+          if (!clockContainer) return null;
+          if (!clockNotesContainer) {
+        clockNotesContainer = document.createElement('div');
+        clockNotesContainer.id = 'clock-notes-container';
+        clockNotesContainer.style.position = 'absolute';
+        clockNotesContainer.style.left = '0';
+        clockNotesContainer.style.top = '0';
+        clockNotesContainer.style.width = '100%';
+        clockNotesContainer.style.height = '100%';
+        clockNotesContainer.style.pointerEvents = 'none';
+        clockContainer.appendChild(clockNotesContainer);
+          }
+          return clockNotesContainer;
+        }
+
+        function renderClockNotes() {
+          const container = ensureClockNotesContainer();
+          if (!container) return;
+          container.innerHTML = '';
+          clockNotes.forEach((note, idx) => {
+        const noteEl = document.createElement('div');
+        noteEl.className = 'clock-note';
+        noteEl.textContent = note.text;
+        noteEl.setAttribute('draggable', 'true');
+        noteEl.style.position = 'absolute';
+        noteEl.style.left = (note.x || 40) + 'px';
+        noteEl.style.top = (note.y || 40 + idx * 40) + 'px';
+        noteEl.style.background = '#fffbe7';
+        noteEl.style.border = '1px solid #e0c97f';
+        noteEl.style.borderRadius = '6px';
+        noteEl.style.padding = '8px 14px';
+        noteEl.style.fontSize = '1em';
+        noteEl.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+        noteEl.style.cursor = 'grab';
+        noteEl.style.pointerEvents = 'auto';
+        noteEl.style.userSelect = 'none';
+        noteEl.style.zIndex = 10 + idx;
+        noteEl.style.minWidth = '80px';
+        noteEl.style.maxWidth = '220px';
+        noteEl.style.wordBreak = 'break-word';
+
+        // Drag logic
+        noteEl.addEventListener('mousedown', function(e) {
+          draggingNote = { idx, startX: e.clientX, startY: e.clientY, origX: note.x || 40, origY: note.y || 40 + idx * 40 };
+          offsetX = e.offsetX;
+          offsetY = e.offsetY;
+          document.body.style.userSelect = 'none';
+        });
+        // Remove note on double click
+        noteEl.addEventListener('dblclick', function() {
+          clockNotes.splice(idx, 1);
+          renderClockNotes();
+        });
+        container.appendChild(noteEl);
+          });
+        }
+
+        document.addEventListener('mousemove', function(e) {
+          if (draggingNote && clockNotes[draggingNote.idx]) {
+        const container = ensureClockNotesContainer();
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        let x = e.clientX - rect.left - offsetX;
+        let y = e.clientY - rect.top - offsetY;
+        // Clamp to container
+        x = Math.max(0, Math.min(x, rect.width - 80));
+        y = Math.max(0, Math.min(y, rect.height - 32));
+        clockNotes[draggingNote.idx].x = x;
+        clockNotes[draggingNote.idx].y = y;
+        renderClockNotes();
+          }
+        });
+        document.addEventListener('mouseup', function() {
+          if (draggingNote) {
+        draggingNote = null;
+        document.body.style.userSelect = '';
+          }
+        });
+
+        // Show note modal for clock
+        document.getElementById('clock-note-btn').addEventListener('click', function() {
+          // Use the existing event modal for notes
+          const modal = document.getElementById('event-modal');
+          const modalText = document.getElementById('event-modal-text');
+          const modalSave = document.getElementById('event-modal-save');
+          const modalClose = document.getElementById('event-modal-close');
+          const modalDate = document.getElementById('event-modal-date');
+          modalDate.textContent = 'Clock Note';
+          modalText.value = '';
+          modal.classList.remove('hidden');
+          modal.style.display = 'block';
+
+          function closeModal() {
+        modal.classList.add('hidden');
+        modal.style.display = '';
+        modalSave.onclick = null;
+        modalClose.onclick = null;
+          }
+          modalClose.onclick = closeModal;
+          modalSave.onclick = function() {
+        const text = modalText.value.trim();
+        if (text) {
+          clockNotes.push({ text, x: 40, y: 40 + clockNotes.length * 40 });
+          renderClockNotes();
+        }
+        closeModal();
+          };
+        });
+
+        // Show/hide notes only when clock is visible
+        function toggleClockNotes() {
+          const clockContainer = document.getElementById('clock-container');
+          if (clockContainer && clockContainer.style.display !== 'none') {
+        renderClockNotes();
+        if (clockNotesContainer) clockNotesContainer.style.display = '';
+          } else {
+        if (clockNotesContainer) clockNotesContainer.style.display = 'none';
+          }
+        }
+        // Listen for clock tab toggle
+        const clockBtn = Array.from(document.querySelectorAll('.dashboard-sidebar button')).find(btn =>
+          btn.textContent.trim().toLowerCase().includes('clock')
+        );
+        if (clockBtn) {
+          clockBtn.addEventListener('click', function() {
+        setTimeout(toggleClockNotes, 100);
+          });
+        }
+        // Hide notes when switching away from clock
+        document.querySelectorAll('.dashboard-sidebar button').forEach(btn => {
+          if (!btn.textContent.trim().toLowerCase().includes('clock')) {
+        btn.addEventListener('click', function() {
+          if (clockNotesContainer) clockNotesContainer.style.display = 'none';
+        });
+          }
+        });
+        // On resize, re-render notes
+        window.addEventListener('resize', function() {
+          if (clockNotesContainer && clockNotesContainer.style.display !== 'none') {
+        renderClockNotes();
+          }
+        });
+      })();
+      </script>
       <button type="button" id="zoom-out">−</button>
       <button type="button" id="zoom-in">+</button>
       <input id="event-search" placeholder="Search…" />
@@ -1138,12 +1296,17 @@
         }
         size = Math.max(size, 220);
 
-        // Only set width/height if changed, and reset transform to avoid cumulative scaling
+        // Prevent cumulative growth: only set width/height if changed
         const newSize = Math.round(size);
         if (canvas.width !== newSize || canvas.height !== newSize) {
           canvas.width = newSize;
           canvas.height = newSize;
+        }
+        // Only set style if changed
+        if (canvas.style.width !== newSize + 'px') {
           canvas.style.width = newSize + 'px';
+        }
+        if (canvas.style.height !== newSize + 'px') {
           canvas.style.height = newSize + 'px';
         }
       }

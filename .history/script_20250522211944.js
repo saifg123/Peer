@@ -527,7 +527,7 @@ animate();
 
 
 // Delegate dragstart from any note-banner
-
+let draggedNoteKey = null;
 
 function clearDragOver() {
   document.querySelectorAll('.day-cell.drag-over, .week-cell.drag-over, .month-cell.drag-over')

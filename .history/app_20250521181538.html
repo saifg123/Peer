@@ -1096,9 +1096,6 @@
         canvas.style.width = size + 'px';
         canvas.style.height = size + 'px';
       }
-
-      // Call resizeCanvas BEFORE appending to DOM or drawing
-      resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
       canvas.style.background = "#f8fafd";
@@ -1118,17 +1115,16 @@
       clockContainer.appendChild(dateEl);
 
       calendarApp.insertBefore(clockContainer, calendarApp.firstChild.nextSibling);
+
+      resizeCanvas();
     }
     clockContainer.style.display = '';
     // Start interval
     if (!clockInterval) {
-      // Track last known parent size to avoid repeated resizing
-      let lastParentWidth = null;
-      let lastParentHeight = null;
-
-      function resizeCanvasIfNeeded() {
+      function updateClock() {
         const canvas = document.getElementById('analog-clock-canvas');
         if (!canvas) return;
+        // Always resize to fill parent
         const parent = calendarApp;
         let w = parent.clientWidth;
         let h = parent.clientHeight;
@@ -1137,21 +1133,12 @@
           size = Math.min(w, h, window.innerWidth, window.innerHeight) * 0.95;
         }
         size = Math.max(size, 220);
-
-        // Only set width/height if changed, and reset transform to avoid cumulative scaling
-        const newSize = Math.round(size);
-        if (canvas.width !== newSize || canvas.height !== newSize) {
-          canvas.width = newSize;
-          canvas.height = newSize;
-          canvas.style.width = newSize + 'px';
-          canvas.style.height = newSize + 'px';
+        if (canvas.width !== Math.round(size) || canvas.height !== Math.round(size)) {
+          canvas.width = Math.round(size);
+          canvas.height = Math.round(size);
+          canvas.style.width = size + 'px';
+          canvas.style.height = size + 'px';
         }
-      }
-
-      function updateClock() {
-        resizeCanvasIfNeeded();
-        const canvas = document.getElementById('analog-clock-canvas');
-        if (!canvas) return;
         const ctx = canvas.getContext('2d');
         ctx.save();
         ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -1163,12 +1150,7 @@
       }
       updateClock();
       clockInterval = setInterval(updateClock, 1000);
-      window.addEventListener('resize', function() {
-        // Reset last known size so resize happens
-        lastParentWidth = null;
-        lastParentHeight = null;
-        updateClock();
-      });
+      window.addEventListener('resize', updateClock);
     }
   }
 

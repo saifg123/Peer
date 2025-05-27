@@ -1138,12 +1138,17 @@
         }
         size = Math.max(size, 220);
 
-        // Only set width/height if changed, and reset transform to avoid cumulative scaling
+        // Prevent cumulative growth: only set width/height if changed
         const newSize = Math.round(size);
         if (canvas.width !== newSize || canvas.height !== newSize) {
           canvas.width = newSize;
           canvas.height = newSize;
+        }
+        // Only set style if changed
+        if (canvas.style.width !== newSize + 'px') {
           canvas.style.width = newSize + 'px';
+        }
+        if (canvas.style.height !== newSize + 'px') {
           canvas.style.height = newSize + 'px';
         }
       }

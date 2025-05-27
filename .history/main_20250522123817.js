@@ -30,7 +30,7 @@ signupForm.addEventListener("submit", (e) => {
       alert("Signup failed: " + error.message);
     });
 });
-  
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyDgt47saNP2MY1CYZ9DKlMUIBvLODhbSoY",
@@ -61,4 +61,25 @@ document.getElementById("googleSignInBtn").addEventListener("click", () => {
         console.error("Google sign-in error:", error);
       });
   });
+
+// Drag and Drop Animation Fix
+document.querySelectorAll('.note').forEach(note => {
+  note.addEventListener('dragstart', function (e) {
+    note.classList.add('dragging');
+  });
+});
+
+document.querySelectorAll('.cell').forEach(cell => {
+  cell.addEventListener('dragover', function (e) {
+    e.preventDefault();
+  });
+  cell.addEventListener('drop', function (e) {
+    e.preventDefault();
+    const draggingNote = document.querySelector('.note.dragging');
+    if (draggingNote) {
+      cell.appendChild(draggingNote);
+      draggingNote.classList.remove('dragging'); // Stop animation
+    }
+  });
+});
 

@@ -1137,14 +1137,17 @@
           size = Math.min(w, h, window.innerWidth, window.innerHeight) * 0.95;
         }
         size = Math.max(size, 220);
-
-        // Only set width/height if changed, and reset transform to avoid cumulative scaling
-        const newSize = Math.round(size);
-        if (canvas.width !== newSize || canvas.height !== newSize) {
-          canvas.width = newSize;
-          canvas.height = newSize;
-          canvas.style.width = newSize + 'px';
-          canvas.style.height = newSize + 'px';
+        // Only update if size actually changed
+        if (
+          canvas.width !== Math.round(size) ||
+          canvas.height !== Math.round(size) ||
+          canvas.style.width !== size + 'px' ||
+          canvas.style.height !== size + 'px'
+        ) {
+          canvas.width = Math.round(size);
+          canvas.height = Math.round(size);
+          canvas.style.width = size + 'px';
+          canvas.style.height = size + 'px';
         }
       }
 

@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <meta charset="UTF-8">
@@ -247,7 +246,6 @@
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();
 
     // Email/password sign-in
     async function handleEmailPasswordSignIn(event) {
@@ -295,83 +293,52 @@
     }
 
     async function fetchClassroomData(event) {
-  event.preventDefault();
+      event.preventDefault();
 
-  let token;
-  try {
-    token = await getAccessToken();
-  } catch (err) {
-    alert("Google Sign-In failed: " + err.message);
-    return;
-  }
+      let token;
+      try {
+        token = await getAccessToken();
+      } catch (err) {
+        alert("Google Sign-In failed: " + err.message);
+        return;
+      }
 
-  const headers = { Authorization: `Bearer ${token}` };
+      const headers = { Authorization: `Bearer ${token}` };
 
-  try {
-    // Get user profile from Google
-    const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { headers });
-    const userData = await userInfoRes.json();
+      try {
+        const coursesRes = await fetch("https://classroom.googleapis.com/v1/courses", { headers });
+        const coursesData = await coursesRes.json();
 
-    // Save user to Firestore
-    const userRef = db.collection("users").doc(userData.sub);  // sub = unique Google ID
-    await userRef.set({
-      email: userData.email,
-      name: userData.name,
-      picture: userData.picture,
-      lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-
-    // Get Google Classroom courses
-    const coursesRes = await fetch("https://classroom.googleapis.com/v1/courses", { headers });
-    const coursesData = await coursesRes.json();
-
-    if (!coursesData.courses || coursesData.courses.length === 0) {
-      console.log("No courses found.");
-      return;
-    }
-
-    for (const course of coursesData.courses) {
-      const courseId = course.id;
-      const courseRef = userRef.collection("courses").doc(courseId);
-
-      // Save basic course info
-      await courseRef.set({
-        name: course.name,
-        section: course.section || "",
-        description: course.description || ""
-      }, { merge: true });
-
-      const endpoints = [
-        { url: `https://classroom.googleapis.com/v1/courses/${courseId}/announcements`, key: "announcements" },
-        { url: `https://classroom.googleapis.com/v1/courses/${courseId}/courseWork`, key: "courseWork" }
-      ];
-
-      for (const { url, key } of endpoints) {
-        const res = await fetch(url, { headers });
-        const data = await res.json();
-
-        if (!res.ok) {
-          console.error(`Error from ${url}:`, data);
-          continue;
+        if (!coursesData.courses || coursesData.courses.length === 0) {
+          console.log("No courses found.");
+          return;
         }
 
-        const firestoreKey = key === "courseWork" ? "assignments" : key;
+        for (const course of coursesData.courses) {
+          const courseId = course.id;
+          const endpoints = [
+            `https://classroom.googleapis.com/v1/courses/${courseId}/announcements`,
+            `https://classroom.googleapis.com/v1/courses/${courseId}/courseWork`
+          ];
 
-        if (Array.isArray(data[key])) {
-          for (const item of data[key]) {
-            await courseRef.collection(firestoreKey).doc(item.id).set(item);
+          for (const url of endpoints) {
+            const res = await fetch(url, { headers });
+            const data = await res.json();
+            if (!res.ok) {
+              console.error(`Error from ${url}:`, data);
+              continue;
+            }
+            console.log(`Data from ${url}:`, data);
           }
         }
+
+        // On success, redirect
+        window.location.href = "app.html";
+      } catch (err) {
+        console.error("Error fetching Classroom data:", err);
+        alert("Failed to fetch Google Classroom data.");
       }
     }
-
-    // Success: Redirect to app
-    window.location.href = "app.html";
-  } catch (err) {
-    console.error("Error fetching Classroom data:", err);
-    alert("Failed to fetch Google Classroom data.");
-  }
-}
   </script>
 </body>
 </html>

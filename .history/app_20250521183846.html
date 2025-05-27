@@ -633,6 +633,233 @@
       </script>
       <div id="view-label">Month</div>
       <button type="button" id="next">&rarr;</button>
+      <!-- --- CLOCK NOTE BUTTON --- -->
+      <button type="button" id="clock-note-btn" title="Add Note to Time" style="background:none;border:none;cursor:pointer;padding:0 8px;vertical-align:middle;">
+        <!-- Pencil SVG -->
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" focusable="false" style="display:block;" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15.5 3.5l3 3-10 10H5.5v-3l10-10z" stroke="#444" stroke-width="2" fill="none"/>
+        </svg>
+      </button>
+      <script>
+      // --- CLOCK NOTE LOGIC ---
+      (function() {
+        // Utilities
+        function getClockNotes() {
+          try {
+        return JSON.parse(localStorage.getItem('clock-notes') || '{}');
+          } catch { return {}; }
+        }
+        function setClockNotes(notes) {
+          localStorage.setItem('clock-notes', JSON.stringify(notes));
+        }
+        function formatTimeKey(date) {
+          // "YYYY-MM-DD HH:MM"
+          return date.getFullYear() + '-' +
+        String(date.getMonth()+1).padStart(2,'0') + '-' +
+        String(date.getDate()).padStart(2,'0') + ' ' +
+        String(date.getHours()).padStart(2,'0') + ':' +
+        String(date.getMinutes()).padStart(2,'0');
+        }
+        // Modal UI (reuse event modal)
+        function showClockNoteModal(timeKey, initialText, onSave) {
+          const modal = document.getElementById('event-modal');
+          const modalText = document.getElementById('event-modal-text');
+          const modalDate = document.getElementById('event-modal-date');
+          const modalSave = document.getElementById('event-modal-save');
+          const modalClose = document.getElementById('event-modal-close');
+          modalDate.textContent = 'Note for ' + timeKey;
+          modalText.value = initialText || '';
+          modal.classList.remove('hidden');
+          modalSave.onclick = function() {
+        onSave(modalText.value);
+        modal.classList.add('hidden');
+          };
+          modalClose.onclick = function() {
+        modal.classList.add('hidden');
+          };
+        }
+        // Add note button logic
+        const noteBtn = document.getElementById('clock-note-btn');
+        let lastClockTimeKey = null;
+        noteBtn.addEventListener('click', function() {
+          // Get current time shown on clock
+          const now = new Date();
+          // Snap to nearest 5 minutes for key
+          now.setSeconds(0,0);
+          now.setMinutes(Math.round(now.getMinutes()/5)*5);
+          const key = formatTimeKey(now);
+          lastClockTimeKey = key;
+          const notes = getClockNotes();
+          showClockNoteModal(key, notes[key]||'', function(val) {
+        if (val && val.trim()) {
+          notes[key] = val.trim();
+        } else {
+          delete notes[key];
+        }
+        setClockNotes(notes);
+        renderClockNotes();
+          });
+        });
+
+        // --- Render notes on the analog clock ---
+        function renderClockNotes() {
+          const clockContainer = document.getElementById('clock-container');
+          const canvas = document.getElementById('analog-clock-canvas');
+          if (!clockContainer || !canvas) return;
+          // Remove old note markers
+          Array.from(clockContainer.querySelectorAll('.clock-note-marker')).forEach(e=>e.remove());
+          const notes = getClockNotes();
+          // For each note, place a marker on the clock
+          Object.keys(notes).forEach(key => {
+        // Parse time
+        const m = key.match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/);
+        if (!m) return;
+        let hour = parseInt(m[4],10), minute = parseInt(m[5],10);
+        // Angle: 0 at top, clockwise
+        let angle = ((hour%12) + minute/60) * 30 - 90; // degrees
+        let rad = angle * Math.PI/180;
+        // Place marker at 80% radius
+        let r = canvas.width/2 * 0.82;
+        let cx = canvas.width/2 + r * Math.cos(rad);
+        let cy = canvas.height/2 + r * Math.sin(rad);
+        // Create marker
+        const marker = document.createElement('div');
+        marker.className = 'clock-note-marker';
+        marker.title = notes[key];
+        marker.setAttribute('draggable','true');
+        marker.style.position = 'absolute';
+        marker.style.left = (cx-11)+'px';
+        marker.style.top = (cy-11)+'px';
+        marker.style.width = '22px';
+        marker.style.height = '22px';
+        marker.style.background = '#fffbe6';
+        marker.style.border = '2px solid #f7b500';
+        marker.style.borderRadius = '50%';
+        marker.style.boxShadow = '0 2px 8px #f7b50033';
+        marker.style.display = 'flex';
+        marker.style.alignItems = 'center';
+        marker.style.justifyContent = 'center';
+        marker.style.cursor = 'pointer';
+        marker.style.zIndex = 10;
+        marker.style.transition = 'box-shadow 0.18s, border 0.18s';
+        marker.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#f7b500" stroke-width="2" fill="#fffbe6"/><path d="M5 7l2 2 3-3" stroke="#f7b500" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+        // Click to edit note
+        marker.addEventListener('click', function(e) {
+          e.stopPropagation();
+          showClockNoteModal(key, notes[key], function(val) {
+            if (val && val.trim()) {
+          notes[key] = val.trim();
+            } else {
+          delete notes[key];
+            }
+            setClockNotes(notes);
+            renderClockNotes();
+          });
+        });
+        // Drag and drop logic
+        marker.addEventListener('dragstart', function(e) {
+          e.dataTransfer.setData('text/plain', key);
+          e.dataTransfer.effectAllowed = 'move';
+          marker.style.opacity = '0.5';
+        });
+        marker.addEventListener('dragend', function(e) {
+          marker.style.opacity = '';
+        });
+        // Allow dropping on clock
+        canvas.ondragover = function(ev) {
+          ev.preventDefault();
+          ev.dataTransfer.dropEffect = 'move';
+        };
+        canvas.ondrop = function(ev) {
+          ev.preventDefault();
+          // Get drop position relative to center
+          const rect = canvas.getBoundingClientRect();
+          let x = ev.clientX - rect.left - canvas.width/2;
+          let y = ev.clientY - rect.top - canvas.height/2;
+          // Angle in radians, 0 at top, clockwise
+          let theta = Math.atan2(y, x);
+          let deg = theta * 180/Math.PI;
+          let hour = ((deg+90)/30);
+          if (hour < 0) hour += 12;
+          let h = Math.floor(hour);
+          let m = Math.round((hour-h)*60/5)*5;
+          if (m === 60) { h++; m=0; }
+          if (h === 12) h = 0;
+          // Use date from original key
+          const oldKey = e.dataTransfer.getData('text/plain');
+          const om = oldKey.match(/^(\d{4})-(\d{2})-(\d{2})/);
+          if (!om) return;
+          const newKey = om[1]+'-'+om[2]+'-'+om[3]+' '+
+            String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+          // Move note
+          if (notes[oldKey]) {
+            notes[newKey] = notes[oldKey];
+            delete notes[oldKey];
+            setClockNotes(notes);
+            renderClockNotes();
+          }
+        };
+        clockContainer.appendChild(marker);
+          });
+        }
+        // Re-render notes when clock is shown or resized
+        function observeClock() {
+          const clockContainer = document.getElementById('clock-container');
+          if (!clockContainer) return;
+          const canvas = document.getElementById('analog-clock-canvas');
+          if (!canvas) return;
+          // Render now, and on resize
+          renderClockNotes();
+          window.addEventListener('resize', renderClockNotes);
+        }
+        // Patch clock show/hide to re-render notes
+        const origShowClock = window.showClock;
+        const origHideClock = window.hideClock;
+        // If clock logic is in closure, use MutationObserver
+        function tryObserveClock() {
+          if (document.getElementById('clock-container')) {
+        observeClock();
+          } else {
+        setTimeout(tryObserveClock, 300);
+          }
+        }
+        // Listen for clock button click to re-render notes
+        document.querySelectorAll('.dashboard-sidebar button').forEach(btn=>{
+          if (
+        btn.textContent.trim().toLowerCase().includes('clock') ||
+        (btn.querySelector('span') && btn.querySelector('span').textContent.trim().toLowerCase() === 'clock')
+          ) {
+        btn.addEventListener('click', function() {
+          setTimeout(tryObserveClock, 300);
+        });
+          }
+        });
+        // Also render on DOMContentLoaded if clock is visible
+        document.addEventListener('DOMContentLoaded', tryObserveClock);
+      })();
+      </script>
+      <style>
+      /* Clock note marker style */
+      .clock-note-marker {
+        box-shadow: 0 2px 8px #f7b50033;
+        border: 2px solid #f7b500;
+        background: #fffbe6;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        position: absolute;
+        z-index: 10;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: box-shadow 0.18s, border 0.18s;
+      }
+      .clock-note-marker:hover {
+        box-shadow: 0 4px 16px #f7b50066;
+        border: 2.5px solid #f7b500;
+      }
+      </style>
       <button type="button" id="zoom-out">−</button>
       <button type="button" id="zoom-in">+</button>
       <input id="event-search" placeholder="Search…" />
@@ -1138,12 +1365,17 @@
         }
         size = Math.max(size, 220);
 
-        // Only set width/height if changed, and reset transform to avoid cumulative scaling
+        // Prevent cumulative growth: only set width/height if changed
         const newSize = Math.round(size);
         if (canvas.width !== newSize || canvas.height !== newSize) {
           canvas.width = newSize;
           canvas.height = newSize;
+        }
+        // Only set style if changed
+        if (canvas.style.width !== newSize + 'px') {
           canvas.style.width = newSize + 'px';
+        }
+        if (canvas.style.height !== newSize + 'px') {
           canvas.style.height = newSize + 'px';
         }
       }

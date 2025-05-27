@@ -844,7 +844,6 @@
     background: #007bff;
     box-shadow: 0 0 16px 0 #007bff;
     transition: background 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1);
-  }
   /* Show icon labels when sidebar is expanded (hover or focus) */
   .dashboard-sidebar button span {
     opacity: 0;
@@ -895,309 +894,180 @@
         transform 0.22s cubic-bezier(.4,1.4,.6,1) 0s;
       display: inline;
     }
+  </style>
+  <!-- --- CLOCK LOGIC --- -->
+  <script>
+  (function() {
+    // Elements
+    const clockBtn = document.querySelector('.dashboard-sidebar button[title="Clock"]');
+    const calendarApp = document.querySelector('.calendar-app');
+    const calendarView = document.getElementById('calendar-view');
+    const calendar = document.getElementById('calendar');
+    let clockContainer = null;
+    let clockInterval = null;
 
-  /* Make the clock fill the calendar area */
-  #clock-container {
-    width: 100%;
-    height: 100%;
-    min-height: 500px;
-    min-width: 350px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-sizing: border-box;
-    position: relative;
-    /* Remove margin-top from JS, handled here */
-  }
-  #analog-clock-canvas {
-    width: 90%;
-    height: auto;
-    max-width: 600px;
-    max-height: 80vh;
-    aspect-ratio: 1/1;
-    background: #f8fafd;
-    border-radius: 50%;
-    box-shadow: 0 4px 32px 0 rgba(0,123,255,0.10);
-    display: block;
-  }
-  #clock-date {
-    font-size: 1.5em;
-    color: #444;
-    margin-top: 32px;
-    font-family: 'Righteous',sans-serif;
-    text-align: center;
-    width: 100%;
-  }
-  @media (max-width: 900px) {
-    #analog-clock-canvas {
-      max-width: 95vw;
-      max-height: 60vw;
-    }
-    #clock-container {
-      min-width: 0;
-      min-height: 300px;
-    }
-  }
-</style>
-<!-- --- CLOCK LOGIC --- -->
-<script>
-(function() {
-  // Elements
-  const calendarApp = document.querySelector('.calendar-app');
-  const calendarView = document.getElementById('calendar-view');
-  const calendar = document.getElementById('calendar');
-  const calendarControls = document.getElementById('calendar-controls');
-  let clockContainer = null;
-  let clockInterval = null;
+    function drawAnalogClock(ctx, radius) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-  function drawAnalogClock(ctx, radius) {
-    ctx.clearRect(-radius - 20, -radius - 20, (radius + 20) * 2, (radius + 20) * 2);
-
-    // Draw face
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = "#fff";
-    ctx.shadowColor = "#007bff";
-    ctx.shadowBlur = 12;
-    ctx.fill();
-    ctx.lineWidth = 6;
-    ctx.strokeStyle = "#007bff";
-    ctx.stroke();
-    ctx.restore();
-
-    // Draw hour marks
-    for (let num = 1; num <= 12; num++) {
-      let ang = num * Math.PI / 6;
+      // Draw face
       ctx.save();
-      ctx.rotate(ang);
-      ctx.translate(0, -radius * 0.82);
-      ctx.rotate(-ang);
-      ctx.font = `${radius * 0.22}px Righteous, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "#444";
-      ctx.fillText(num.toString(), 0, 0);
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = "#fff";
+      ctx.shadowColor = "#007bff";
+      ctx.shadowBlur = 12;
+      ctx.fill();
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "#007bff";
+      ctx.stroke();
+      ctx.restore();
+
+      // Draw hour marks
+      for (let num = 1; num <= 12; num++) {
+        let ang = num * Math.PI / 6;
+        ctx.save();
+        ctx.rotate(ang);
+        ctx.translate(0, -radius * 0.82);
+        ctx.rotate(-ang);
+        ctx.font = `${radius * 0.22}px Righteous, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#444";
+        ctx.fillText(num.toString(), 0, 0);
+        ctx.restore();
+      }
+
+      // Draw minute marks
+      ctx.save();
+      ctx.strokeStyle = "#bbb";
+      for (let i = 0; i < 60; i++) {
+        let ang = i * Math.PI / 30;
+        ctx.beginPath();
+        ctx.rotate(ang);
+        ctx.moveTo(0, -radius * 0.95);
+        ctx.lineTo(0, -radius * 0.9);
+        ctx.stroke();
+        ctx.rotate(-ang);
+      }
+      ctx.restore();
+
+      // Get current time
+      const now = new Date();
+      let hour = now.getHours();
+      let minute = now.getMinutes();
+      let second = now.getSeconds();
+
+      // Hour hand
+      ctx.save();
+      ctx.strokeStyle = "#007bff";
+      ctx.lineWidth = radius * 0.09;
+      ctx.lineCap = "round";
+      let hourAngle = ((hour % 12) + minute / 60 + second / 3600) * Math.PI / 6;
+      ctx.rotate(hourAngle);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, -radius * 0.55);
+      ctx.stroke();
+      ctx.restore();
+
+      // Minute hand
+      ctx.save();
+      ctx.strokeStyle = "#222";
+      ctx.lineWidth = radius * 0.06;
+      ctx.lineCap = "round";
+      let minAngle = (minute + second / 60) * Math.PI / 30;
+      ctx.rotate(minAngle);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, -radius * 0.75);
+      ctx.stroke();
+      ctx.restore();
+
+      // Second hand
+      ctx.save();
+      ctx.strokeStyle = "#e74c3c";
+      ctx.lineWidth = radius * 0.025;
+      ctx.lineCap = "round";
+      let secAngle = second * Math.PI / 30;
+      ctx.rotate(secAngle);
+      ctx.beginPath();
+      ctx.moveTo(0, radius * 0.18);
+      ctx.lineTo(0, -radius * 0.82);
+      ctx.stroke();
+      ctx.restore();
+
+      // Center dot
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(0, 0, radius * 0.07, 0, 2 * Math.PI);
+      ctx.fillStyle = "#007bff";
+      ctx.fill();
       ctx.restore();
     }
 
-    // Draw minute marks
-    ctx.save();
-    ctx.strokeStyle = "#bbb";
-    for (let i = 0; i < 60; i++) {
-      let ang = i * Math.PI / 30;
-      ctx.beginPath();
-      ctx.rotate(ang);
-      ctx.moveTo(0, -radius * 0.95);
-      ctx.lineTo(0, -radius * 0.9);
-      ctx.stroke();
-      ctx.rotate(-ang);
-    }
-    ctx.restore();
+    function showClock() {
+      // Hide calendar
+      calendar.style.display = 'none';
+      calendarView.style.display = 'none';
+      // Create clock if not exists
+      if (!clockContainer) {
+        clockContainer = document.createElement('div');
+        clockContainer.id = 'clock-container';
+        clockContainer.style.cssText = `
+          display:flex;flex-direction:column;align-items:center;justify-content:center;
+          height:340px;font-family:'Righteous',sans-serif;font-size:48px;color:#007bff;
+          margin-top:48px;transition:opacity 0.3s;
+        `;
+        const canvas = document.createElement('canvas');
+        canvas.id = 'analog-clock-canvas';
+        canvas.width = 300;
+        canvas.height = 300;
+        canvas.style.background = "#f8fafd";
+        canvas.style.borderRadius = "50%";
+        canvas.style.boxShadow = "0 4px 32px 0 rgba(0,123,255,0.10)";
+        clockContainer.appendChild(canvas);
 
-    // Get current time
-    const now = new Date();
-    let hour = now.getHours();
-    let minute = now.getMinutes();
-    let second = now.getSeconds();
+        const dateEl = document.createElement('div');
+        dateEl.id = 'clock-date';
+        dateEl.style.fontSize = '1.2em';
+        dateEl.style.color = '#444';
+        dateEl.style.marginTop = '18px';
+        dateEl.style.fontFamily = "'Righteous',sans-serif";
+        clockContainer.appendChild(dateEl);
 
-    // Hour hand
-    ctx.save();
-    ctx.strokeStyle = "#007bff";
-    ctx.lineWidth = radius * 0.09;
-    ctx.lineCap = "round";
-    let hourAngle = ((hour % 12) + minute / 60 + second / 3600) * Math.PI / 6;
-    ctx.rotate(hourAngle);
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, -radius * 0.55);
-    ctx.stroke();
-    ctx.restore();
-
-    // Minute hand
-    ctx.save();
-    ctx.strokeStyle = "#222";
-    ctx.lineWidth = radius * 0.06;
-    ctx.lineCap = "round";
-    let minAngle = (minute + second / 60) * Math.PI / 30;
-    ctx.rotate(minAngle);
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, -radius * 0.75);
-    ctx.stroke();
-    ctx.restore();
-
-    // Second hand
-    ctx.save();
-    ctx.strokeStyle = "#e74c3c";
-    ctx.lineWidth = radius * 0.025;
-    ctx.lineCap = "round";
-    let secAngle = second * Math.PI / 30;
-    ctx.rotate(secAngle);
-    ctx.beginPath();
-    ctx.moveTo(0, radius * 0.18);
-    ctx.lineTo(0, -radius * 0.82);
-    ctx.stroke();
-    ctx.restore();
-
-    // Center dot
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(0, 0, radius * 0.07, 0, 2 * Math.PI);
-    ctx.fillStyle = "#007bff";
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function showClock() {
-    // Hide calendar
-    calendar.style.display = 'none';
-    calendarView.style.display = 'none';
-    if (calendarControls) calendarControls.style.display = 'none';
-    // Create clock if not exists
-    if (!clockContainer) {
-      clockContainer = document.createElement('div');
-      clockContainer.id = 'clock-container';
-
-      // Make clock container fill the calendar-app
-      clockContainer.style.width = '100%';
-      clockContainer.style.height = '100%';
-      clockContainer.style.minHeight = '500px';
-      clockContainer.style.minWidth = '350px';
-      clockContainer.style.display = 'flex';
-      clockContainer.style.flexDirection = 'column';
-      clockContainer.style.alignItems = 'center';
-      clockContainer.style.justifyContent = 'center';
-      clockContainer.style.margin = '0';
-      clockContainer.style.padding = '0';
-      clockContainer.style.boxSizing = 'border-box';
-      clockContainer.style.position = 'relative';
-
-      // Responsive sizing
-      let canvas = document.createElement('canvas');
-      canvas.id = 'analog-clock-canvas';
-      // Set canvas size to match calendar-app size
-      function resizeCanvas() {
-        // Get calendar-app size
-        const parent = calendarApp;
-        let w = parent.clientWidth;
-        let h = parent.clientHeight;
-        // Use the smaller of width/height, minus some padding
-        let size = Math.min(w, h, 600) * 0.9;
-        if (window.innerWidth < 900) {
-          size = Math.min(w, h, window.innerWidth, window.innerHeight) * 0.95;
-        }
-        size = Math.max(size, 220);
-        canvas.width = Math.round(size);
-        canvas.height = Math.round(size);
-        canvas.style.width = size + 'px';
-        canvas.style.height = size + 'px';
+        calendarApp.insertBefore(clockContainer, calendarApp.firstChild.nextSibling);
       }
-
-      // Call resizeCanvas BEFORE appending to DOM or drawing
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas);
-
-      canvas.style.background = "#f8fafd";
-      canvas.style.borderRadius = "50%";
-      canvas.style.boxShadow = "0 4px 32px 0 rgba(0,123,255,0.10)";
-      canvas.style.display = "block";
-      clockContainer.appendChild(canvas);
-
-      const dateEl = document.createElement('div');
-      dateEl.id = 'clock-date';
-      dateEl.style.fontSize = '1.5em';
-      dateEl.style.color = '#444';
-      dateEl.style.marginTop = '32px';
-      dateEl.style.fontFamily = "'Righteous',sans-serif";
-      dateEl.style.textAlign = 'center';
-      dateEl.style.width = '100%';
-      clockContainer.appendChild(dateEl);
-
-      calendarApp.insertBefore(clockContainer, calendarApp.firstChild.nextSibling);
-    }
-    clockContainer.style.display = '';
-    // Start interval
-    if (!clockInterval) {
-      // Track last known parent size to avoid repeated resizing
-      let lastParentWidth = null;
-      let lastParentHeight = null;
-
-      function resizeCanvasIfNeeded() {
-        const canvas = document.getElementById('analog-clock-canvas');
-        if (!canvas) return;
-        const parent = calendarApp;
-        let w = parent.clientWidth;
-        let h = parent.clientHeight;
-        let size = Math.min(w, h, 600) * 0.9;
-        if (window.innerWidth < 900) {
-          size = Math.min(w, h, window.innerWidth, window.innerHeight) * 0.95;
+      clockContainer.style.display = '';
+      // Start interval
+      if (!clockInterval) {
+        function updateClock() {
+          const canvas = document.getElementById('analog-clock-canvas');
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+          ctx.save();
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          drawAnalogClock(ctx, canvas.width / 2 - 12);
+          ctx.restore();
+          // Date
+          const now = new Date();
+          document.getElementById('clock-date').textContent = now.toLocaleDateString(undefined, {weekday:'long', year:'numeric', month:'long', day:'numeric'});
         }
-        size = Math.max(size, 220);
-
-        // Only set width/height if changed, and reset transform to avoid cumulative scaling
-        const newSize = Math.round(size);
-        if (canvas.width !== newSize || canvas.height !== newSize) {
-          canvas.width = newSize;
-          canvas.height = newSize;
-          canvas.style.width = newSize + 'px';
-          canvas.style.height = newSize + 'px';
-        }
-      }
-
-      function updateClock() {
-        resizeCanvasIfNeeded();
-        const canvas = document.getElementById('analog-clock-canvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        ctx.save();
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        drawAnalogClock(ctx, canvas.width / 2 - 12);
-        ctx.restore();
-        // Date
-        const now = new Date();
-        document.getElementById('clock-date').textContent = now.toLocaleDateString(undefined, {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-      }
-      updateClock();
-      clockInterval = setInterval(updateClock, 1000);
-      window.addEventListener('resize', function() {
-        // Reset last known size so resize happens
-        lastParentWidth = null;
-        lastParentHeight = null;
         updateClock();
-      });
+        clockInterval = setInterval(updateClock, 1000);
+      }
     }
-  }
 
-  function hideClock() {
-    if (clockContainer) clockContainer.style.display = 'none';
-    if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
-    calendar.style.display = '';
-    calendarView.style.display = '';
-    if (calendarControls) calendarControls.style.display = '';
-    window.removeEventListener('resize', null);
-  }
-
-  // Track state
-  let clockActive = false;
-
-  // Find the "Clock" button in the sidebar
-  let clockBtn = null;
-  document.querySelectorAll('.dashboard-sidebar button').forEach(btn => {
-    if (
-      btn.textContent.trim().toLowerCase().includes('clock') ||
-      (btn.querySelector('span') && btn.querySelector('span').textContent.trim().toLowerCase() === 'clock')
-    ) {
-      clockBtn = btn;
+    function hideClock() {
+      if (clockContainer) clockContainer.style.display = 'none';
+      if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+      calendar.style.display = '';
+      calendarView.style.display = '';
     }
-  });
 
-  if (clockBtn) {
-    clockBtn.addEventListener('click', function(e) {
-      e.preventDefault();
+    // Track state
+    let clockActive = false;
+
+    clockBtn.addEventListener('click', function() {
       clockActive = !clockActive;
       if (clockActive) {
         showClock();
@@ -1205,18 +1075,17 @@
         hideClock();
       }
     });
-  }
 
-  // Hide clock if user clicks any other sidebar button
-  document.querySelectorAll('.dashboard-sidebar button').forEach(btn => {
-    if (btn !== clockBtn) {
-      btn.addEventListener('click', () => {
-        if (clockActive) {
-          clockActive = false;
-          hideClock();
-        }
-      });
-    }
-  });
-})();
-</script>
+    // Hide clock if user clicks any other sidebar button
+    document.querySelectorAll('.dashboard-sidebar button').forEach(btn => {
+      if (btn !== clockBtn) {
+        btn.addEventListener('click', () => {
+          if (clockActive) {
+            clockActive = false;
+            hideClock();
+          }
+        });
+      }
+    });
+  })();
+  </script>

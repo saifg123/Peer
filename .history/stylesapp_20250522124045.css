@@ -408,7 +408,37 @@ body {
 
 /* Week-view cells */
 
+/* Balatro-style drag animation */
+.smooth-dragging {
+  position: absolute;
+  z-index: 10000;
+  pointer-events: none;
+  background: #ffe478;
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25), 0 1.5px 0 #e0b800 inset;
+  transform: rotate(-6deg) scale(1.08);
+  animation: balatro-float 0.7s infinite cubic-bezier(.4,1.6,.6,.9);
+  border: 2.5px solid #f0c000;
+  filter: drop-shadow(0 2px 0 #fffbe0);
+}
 
+@keyframes balatro-float {
+  0%   { transform: rotate(-6deg) scale(1.08) translateY(0); }
+  30%  { transform: rotate(-7deg) scale(1.11) translateY(-7px); }
+  60%  { transform: rotate(-5deg) scale(1.09) translateY(-3px); }
+  100% { transform: rotate(-6deg) scale(1.08) translateY(0); }
+}
+
+.note-banner.drop-bounce {
+  animation: balatro-drop-bounce 0.32s cubic-bezier(.3,1.6,.6,1);
+}
+
+@keyframes balatro-drop-bounce {
+  0%   { transform: scale(1.13) rotate(-5deg) translateY(-8px); }
+  60%  { transform: scale(0.97) rotate(1deg) translateY(2px);}
+  100% { transform: scale(1) rotate(0deg) translateY(0);}
+}
 .week-cell {
   /* your existing rules… */
   transition: background 0.2s;
@@ -465,68 +495,37 @@ body {
   font-size: 0.9em;
   border-radius: 4px;
 }
-/* —————— GPU-accelerated, smoothly transitioning ghost —————— */
-/* Drag ghost (Balatro-style) */
-.drag-ghost {
-  position: fixed;
+.smooth-dragging {
+  position: absolute;
+  z-index: 10000;
   pointer-events: none;
-  z-index: 2000;
-  top: 0; left: 0;
-  will-change: transform, opacity;
-  transition:
-    transform 0.18s cubic-bezier(.22,1,.36,1),
-    box-shadow 0.18s cubic-bezier(.22,1,.36,1),
-    opacity 0.12s;
-  opacity: 0.96;
-  box-shadow:
-    0 6px 24px 0 rgba(0,0,0,0.18),
-    0 1.5px 4px 0 rgba(0,0,0,0.10);
-  border-radius: 12px;
-  background: linear-gradient(120deg, #fffbe7 80%, #ffe082 100%);
-  border: 2.5px solid #fbc02d;
-  filter: drop-shadow(0 2px 0 #fffde7);
-  transform: scale(1.08) rotate(-2deg);
-  padding: 6px 14px;
-  font-family: Righteous, sans-serif;
-  font-size: 1.05em;
-  font-weight: 400;
-  color: #333;
-  text-shadow: 0 1px 0 #fffde7, 0 2px 4px #ffe082;
-  box-sizing: border-box;
-  cursor: grabbing;
-  user-select: none;
-}
-
-/* Animate ghost on drop */
-.drag-ghost.dropping {
-  opacity: 0;
-  transform: scale(0.92) rotate(2deg);
-  transition:
-    opacity 0.14s,
-    transform 0.14s cubic-bezier(.22,1,.36,1);
-}
-
-/* Drop target highlight (Balatro-style) */
-.day-cell.drag-over,
-.week-cell.drag-over,
-.month-cell.drag-over {
-  background: linear-gradient(90deg, #fffde7 80%, #ffe082 100%);
-  box-shadow: 0 0 0 3px #ffe082 inset, 0 2px 8px #ffe08233;
+  background: #ffe478;
+  padding: 10px 14px;
   border-radius: 8px;
-  outline: 2px dashed #fbc02d;
-  outline-offset: -2px;
-  transition: background 0.18s, box-shadow 0.18s, outline 0.18s;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  transform: rotate(-2deg) scale(1.05);
+  animation: wobble-float 0.5s infinite ease-in-out;
 }
 
-/* Bounce on drop */
-@keyframes drop-bounce {
-  0%   { transform: translateY(-4px) scale(1.02); }
-  50%  { transform: translateY(2px)  scale(0.98); }
-  100% { transform: translateY(0)     scale(1); }
+@keyframes wobble-float {
+  0%   { transform: rotate(-2deg) translateY(0); }
+  50%  { transform: rotate(-3deg) translateY(-3px); }
+  100% { transform: rotate(-2deg) translateY(0); }
 }
 
 .note-banner.drop-bounce {
-  animation: drop-bounce 0.4s ease-out forwards;
+  animation: drop-bounce 0.3s ease-out;
 }
 
+@keyframes drop-bounce {
+  0%   { transform: scale(1.1) translateY(-4px); }
+  100% { transform: scale(1) translateY(0); }
+}
 
+.smooth-dragging {
+  position: fixed; /* Not absolute, so it tracks viewport scroll */
+  top: 0;
+  left: 0;
+  transition: none;
+  pointer-events: none;
+}
