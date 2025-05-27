@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notion-Style Web App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f7f6f3;
+      color: #2e2e2e;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      height: 50px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid #e0e0e0;
+      position: relative;
+      z-index: 2;
+    }
+
+    header .logo {
+      font-weight: bold;
+    }
+
+    main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    nav {
+      width: 240px;
+      background: #fbfaf8;
+      border-right: 1px solid #e0e0e0;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    nav h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      color: #888;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    nav li {
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    nav li:hover {
+      background: #f0efec;
+    }
+
+    .content {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+
+    .block {
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .block:hover {
+      background: #f0efec;
+    }
+
+    .block[contenteditable]:focus {
+      outline: none;
+      background: #fffbe6;
+    }
+
+    /* Simple scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    button.add-block {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #ededed;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button.add-block:hover {
+      background: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Notion Clone</div>
+    <div>User ▾</div>
+  </header>
+  <main>
+    <nav>
+      <h2>Pages</h2>
+      <ul>
+        <li>📝 Notes</li>
+        <li>📅 Calendar</li>
+        <li>✅ Tasks</li>
+        <li>📚 Wiki</li>
+      </ul>
+    </nav>
+    <div class="content">
+      <div class="page-title" contenteditable="true">Untitled Page</div>
+      <div class="blocks" id="blocks">
+        <div class="block" contenteditable="true">Type '/' for commands</div>
+      </div>
+      <button class="add-block" onclick="addBlock()">+ Add block</button>
+    </div>
+  </main>
+
+  <script>
+    function addBlock() {
+      const blocks = document.getElementById('blocks');
+      const newBlock = document.createElement('div');
+      newBlock.className = 'block';
+      newBlock.contentEditable = true;
+      newBlock.textContent = 'New block';
+      blocks.appendChild(newBlock);
+      newBlock.focus();
+    }
+  </script>
+</body>
+</html>

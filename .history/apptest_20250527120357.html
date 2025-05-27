@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notion-Style Calendar App</title>
+  <style>
+    :root {
+      --bg: #f9f9fb;
+      --sidebar: #ffffffcc;
+      --main: #ffffffd9;
+      --accent: #3f8cff;
+      --text: #2e2e2e;
+      --muted: #888;
+      --radius: 12px;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: all 0.2s ease-in-out;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      color: var(--text);
+    }
+
+    header {
+      height: 60px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      box-shadow: var(--shadow);
+      z-index: 2;
+    }
+
+    main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    nav, .calendar-sidebar, .right-sidebar {
+      width: 260px;
+      background: var(--sidebar);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: inset -1px 0 0 #ddd;
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    .calendar-sidebar { display: none; }
+
+    .content {
+      flex: 1;
+      background: var(--main);
+      padding: 32px;
+      overflow-y: auto;
+      border-radius: var(--radius);
+      margin: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    nav h2, .calendar-sidebar h2, .right-sidebar h2 {
+      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    nav li {
+      list-style: none;
+      padding: 10px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+
+    nav li:hover, nav li.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .block {
+      background: white;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .block[contenteditable]:focus {
+      outline: 2px solid var(--accent);
+    }
+
+    .add-block {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+
+    .timeline {
+      display: none;
+    }
+
+    .hour-block {
+      position: relative;
+      height: 60px;
+      border-top: 1px solid #ddd;
+      padding-left: 48px;
+    }
+
+    .hour-block:hover {
+      background: #f1f6ff;
+    }
+
+    .hour-label {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      width: 40px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .right-sidebar {
+      display: none;
+    }
+
+    .todo-list li {
+      background: #fff;
+      padding: 8px;
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+
+    .todo-list li input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    .chat-box {
+      display: none;
+      flex-direction: column;
+    }
+
+    .chat-box textarea {
+      width: 100%;
+      height: 150px;
+      resize: none;
+      border-radius: var(--radius);
+      border: 1px solid #ccc;
+      margin-bottom: 8px;
+      padding: 10px;
+    }
+
+    .chat-box .chat-log {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 8px;
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .chat-box .bubble {
+      background: #e0e0ff;
+      margin-bottom: 6px;
+      padding: 8px 12px;
+      border-radius: var(--radius);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>Notion Calendar</div>
+    <div>User ▾</div>
+  </header>
+  <main>
+    <nav id="defaultSidebar">
+      <h2>Navigation</h2>
+      <ul>
+        <li onclick="showView('notes')" class="active">📝 Notes</li>
+        <li onclick="showView('calendar')">📅 Calendar</li>
+      </ul>
+    </nav>
+
+    <div class="calendar-sidebar" id="calendarSidebar">
+      <h2>Calendar View</h2>
+      <select><option>May 2025</option></select>
+      <select><option>Monday</option></select>
+      <button onclick="showView('notes')">← Back to App</button>
+    </div>
+
+    <div class="content" id="mainContent">
+      <div id="notesView">
+        <div class="page-title" contenteditable="true">Untitled Page</div>
+        <div class="blocks" id="blocks">
+          <div class="block" contenteditable="true">Start typing...</div>
+        </div>
+        <button class="add-block" onclick="addBlock()">+ Add block</button>
+      </div>
+      <div class="timeline" id="calendarTimeline"></div>
+    </div>
+
+    <div class="right-sidebar" id="rightSidebar">
+      <div id="todoPanel">
+        <h2>To-Do</h2>
+        <input type="text" placeholder="New task..." onkeydown="addTodo(event)" />
+        <ul class="todo-list" id="todoList"></ul>
+        <button onclick="toggleChat(true)">💬 Chat</button>
+      </div>
+      <div class="chat-box" id="chatPanel">
+        <h2>Chat with AI</h2>
+        <div class="chat-log" id="chatLog"></div>
+        <textarea id="chatInput" placeholder="Ask something..."></textarea>
+        <button onclick="toggleChat(false)">← Back</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function addBlock() {
+      const newBlock = document.createElement('div');
+      newBlock.className = 'block';
+      newBlock.contentEditable = true;
+      newBlock.textContent = 'New block';
+      document.getElementById('blocks').appendChild(newBlock);
+      newBlock.focus();
+    }
+
+    function showView(view) {
+      document.querySelectorAll("nav li").forEach(li => li.classList.remove("active"));
+      const tabMap = { notes: 0, calendar: 1 };
+      document.querySelectorAll("nav li")[tabMap[view]].classList.add("active");
+
+      const notesView = document.getElementById("notesView");
+      const timeline = document.getElementById("calendarTimeline");
+      const defaultSidebar = document.getElementById("defaultSidebar");
+      const calendarSidebar = document.getElementById("calendarSidebar");
+      const rightSidebar = document.getElementById("rightSidebar");
+
+      if (view === 'calendar') {
+        notesView.style.display = 'none';
+        timeline.style.display = 'block';
+        defaultSidebar.style.display = 'none';
+        calendarSidebar.style.display = 'block';
+        rightSidebar.style.display = 'block';
+        renderTimeline();
+      } else {
+        notesView.style.display = 'block';
+        timeline.style.display = 'none';
+        defaultSidebar.style.display = 'block';
+        calendarSidebar.style.display = 'none';
+        rightSidebar.style.display = 'none';
+      }
+    }
+
+    function renderTimeline() {
+      const container = document.getElementById("calendarTimeline");
+      container.innerHTML = '';
+      for (let i = 0; i < 24; i++) {
+        const block = document.createElement("div");
+        block.className = "hour-block";
+        block.innerHTML = `<div class="hour-label">${String(i).padStart(2, '0')}:00</div>`;
+        container.appendChild(block);
+      }
+    }
+
+    function toggleChat(show) {
+      document.getElementById("todoPanel").style.display = show ? "none" : "block";
+      document.getElementById("chatPanel").style.display = show ? "flex" : "none";
+    }
+
+    function addTodo(event) {
+      if (event.key === "Enter" && event.target.value.trim()) {
+        const li = document.createElement("li");
+        li.innerHTML = `<input type='checkbox'> ${event.target.value}`;
+        document.getElementById("todoList").appendChild(li);
+        event.target.value = '';
+      }
+    }
+
+    renderTimeline();
+  </script>
+</body>
+</html>

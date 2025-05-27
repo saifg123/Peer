@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const box = document.querySelector('.continue-box');
+        if (box) {
+            box.style.cursor = 'pointer';
+            box.addEventListener('click', function() {
+                window.location.href = 'app.html';
+            });
+        }
+    });
+</script>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Quicksand:wght@300..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Peer - Home</title>
+    <style>
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            padding: 18px 32px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            margin: 24px auto 0 auto;
+            max-width: 600px;
+        }
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header-placeholder {
+            font-family: 'Lexend', sans-serif;
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #fff;
+            background: #222;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 18px;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .header-home {
+            font-family: 'Lexend', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #222;
+            margin-left: 185px;
+            letter-spacing: 0.5px;
+        }
+        .guest-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f6fa;
+            border-radius: 50%;
+            margin-left: 16px;
+        }
+        .guest-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #888;
+        }
+    </style>
+    <style>
+        body {
+            background: #f5f6fa;
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .continue-box {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 40px 32px;
+            min-width: 320px;
+            text-align: center;
+            position: absolute;
+            top: 120px;
+            left: 32px;
+            font-size: 1.2rem;
+            color: #222;
+        }
+        .continue-box:hover {
+            background: #e0e0e0;
+            transition: background 0.3s ease;
+        }
+        .to-do-box {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 40px 32px;
+            min-width: 320px;
+            min-height: 80px;
+            text-align: center;
+            position: absolute;
+            top: 100px;
+            left: 400px;
+            font-size: 1.2rem;
+            color: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 48px;
+        }
+        .to-do-box:hover {
+            background: #e0e0e0;
+            transition: background 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            Peer
+            <span class="header-home">Home</span>
+        </div>
+        <div class="guest-icon">
+            <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M12 14c-4 0-7 2-7 4v2h14v-2c0-2-3-4-7-4z"/>
+            </svg>
+        </div>
+    </div>
+    <div class="continue-box">
+        Continue where you left off, ----.
+    </div>
+    <div class="to-do-box"></div>
+</body>
+</html>

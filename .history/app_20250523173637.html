@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peer Calendar</title>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="stylesapp.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Quicksand:wght@300..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+  <style>
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background-color: #AB9263;
+      border-bottom: 3px solid #172C31;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .app-logo { height: 40px; }
+    .header-center-text {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 30px;
+      font-weight: 600;
+      flex-grow: 1;
+      text-align: center;
+      color: #446140;
+    }
+    .profile-icon {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .app-container {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    .calendar-app {
+      flex: 2;
+      min-width: 0;
+      transition: margin-left 0.4s cubic-bezier(.4,1.4,.6,1);
+      margin-left: 48px;
+    }
+    .dashboard-sidebar {
+      width: 48px;
+      min-width: 48px;
+      max-width: 48px;
+      transition: width 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1), background 0.4s cubic-bezier(.4,1.4,.6,1);
+      overflow: hidden;
+      box-shadow: 2px 0 16px 0 rgba(34,44,56,0.18), 0 0 0 1px #e0e0e0;
+      border-right: 1.5px solid #e0e0e0;
+      background: #f3f4f7;
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      height: 100vh;
+    }
+    .dashboard-sidebar:hover,
+    .dashboard-sidebar:focus-within {
+      width: 180px;
+      min-width: 180px;
+      max-width: 180px;
+      background: #f5f5f5;
+      box-shadow: 4px 0 24px 0 rgba(34,44,56,0.28), 0 0 0 1.5px #007bff;
+      z-index: 102;
+    }
+    .dashboard-sidebar button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 14px;
+      padding: 8px 0 8px 10px;
+      border: none;
+      background: none;
+      border-radius: 6px;
+      min-height: 44px;
+      font-size: 15px;
+      color: #444;
+      transition: background 0.15s, color 0.15s;
+      position: relative;
+      overflow: visible;
+    }
+    .dashboard-sidebar button:hover {
+      background: #e9e9e9;
+      color: #007bff;
+    }
+    .dashboard-sidebar button svg {
+      flex-shrink: 0;
+      margin-right: 0;
+      display: block;
+      transition: margin 0.22s;
+    }
+    .dashboard-sidebar:not(:hover):not(:focus-within) button span {
+      display: none;
+    }
+    .dashboard-sidebar:hover button span,
+    .dashboard-sidebar:focus-within button span {
+      display: inline;
+      margin-left: 8px;
+      transition: margin-left 0.22s cubic-bezier(.4,1.4,.6,1);
+    }
+    .dashboard-sidebar::after {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 100vh;
+      background: #007bff;
+      position: absolute;
+      left: 0;
+      top: 0;
+      border-radius: 2px;
+      transition: background 0.4s cubic-bezier(.4,1.4,.6,1), height 0.4s cubic-bezier(.4,1.4,.6,1);
+      z-index: 101;
+      pointer-events: none;
+      box-shadow: 0 0 8px 0 #007bff;
+    }
+    .dashboard-sidebar:hover::after,
+    .dashboard-sidebar:focus-within::after {
+      background: #007bff;
+      box-shadow: 0 0 16px 0 #007bff;
+    }
+    .dashboard-sidebar button .sidebar-fade-icon {
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%) scale(0.92);
+      width: 22px;
+      height: 22px;
+      display: block !important;
+      transition: opacity 0.32s cubic-bezier(.4,1.4,.6,1) 0.12s, transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.12s;
+    }
+    .dashboard-sidebar:hover button .sidebar-fade-icon,
+    .dashboard-sidebar:focus-within button .sidebar-fade-icon {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(-50%) scale(1);
+      transition-delay: 0.12s;
+    }
+    /* Removed code that hides SVG icons on hover to keep icons visible */
+    .chatbox {
+      flex: 1;
+      min-width: 300px;
+      max-width: 400px;
+      margin-left: 24px;
+      background: #fafafa;
+      border-left: 1px solid #e0e0e0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    /* Sidebar icon pop-out effect on hover */
+    .dashboard-sidebar:hover button svg,
+    .dashboard-sidebar:focus-within button svg {
+      transform: translateX(8px) scale(1.08);
+      transition: transform 0.28s cubic-bezier(.4,1.4,.6,1);
+    }
+    .dashboard-sidebar button svg {
+      transition: transform 0.28s cubic-bezier(.4,1.4,.6,1);
+      font-family: 'Quicksand', sans-serif;
+    }
+    /* Sidebar icon label: animate "coming out" from icon */
+    .dashboard-sidebar button span {
+      opacity: 0;
+      margin-left: 0;
+      transform: translateX(-16px) scale(0.98);
+      display: inline;
+      transition:
+      opacity 0.22s 0.36s,
+      margin-left 0.22s 0.36s,
+      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
+    }
+    .dashboard-sidebar:hover button span,
+    .dashboard-sidebar:focus-within button span {
+      opacity: 1;
+      margin-left: 8px;
+      transform: translateX(0) scale(1);
+      transition:
+      opacity 0.22s 0.36s,
+      margin-left 0.22s 0.36s,
+      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
+    }
+    .dashboard-sidebar:hover button span,
+    .dashboard-sidebar:focus-within button span {
+      opacity: 1;
+      margin-left: 8px;
+      transform: translateX(0) scale(1);
+      transition:
+      opacity 0.22s 0.36s,
+      margin-left 0.22s 0.36s,
+      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
+    }
+    .dashboard-sidebar:not(:hover):not(:focus-within) button span {
+      opacity: 0;
+      margin-left: 0;
+      transform: translateX(-16px) scale(0.98);
+      transition:
+      opacity 0.12s 0s,
+      margin-left 0.12s 0s,
+      transform 0.22s cubic-bezier(.4,1.4,.6,1) 0s;
+    }
+    .dashboard-sidebar button span {
+      display: inline;
+      opacity: 0;
+      margin-left: 0;
+      transform: translateX(-16px) scale(0.98);
+      transition:
+      opacity 0.22s 0.36s,
+      margin-left 0.22s 0.36s,
+      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
+    }
+    .dashboard-sidebar:hover button span,
+    .dashboard-sidebar:focus-within button span {
+      opacity: 1;
+      margin-left: 8px;
+      transform: translateX(0) scale(1);
+      transition:
+      opacity 0.22s 0.36s,
+      margin-left 0.22s 0.36s,
+      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
+    }
+    .dashboard-sidebar:not(:hover):not(:focus-within) button span {
+      opacity: 0;
+      margin-left: 0;
+      transform: translateX(-16px) scale(0.98);
+      transition:
+      opacity 0.12s 0s,
+      margin-left 0.12s 0s,
+      transform 0.22s cubic-bezier(.4,1.4,.6,1) 0s;
+    }
+
+    /* Sidebar icon label: fade in only after sidebar width transition finishes */
+    .dashboard-sidebar button span {
+      opacity: 0;
+      margin-left: 0;
+      font-size: 15px;
+      color: #444;
+      white-space: nowrap;
+      font-family: 'Quicksand', sans-serif;
+      transition:
+        opacity 0.22s 0.36s,
+        margin-left 0.22s 0.36s,
+        transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
+      display: inline;
+      transform: translateX(-16px) scale(0.98);
+    }
+    .dashboard-sidebar:hover button span,
+    .dashboard-sidebar:focus-within button span {
+      opacity: 1;
+      margin-left: 8px;
+      transform: translateX(0) scale(1);
+      transition:
+        opacity 0.22s 0.36s,
+        margin-left 0.22s 0.36s,
+        transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
+    }
+    .dashboard-sidebar:not(:hover):not(:focus-within) button span {
+      opacity: 0;
+      margin-left: 0;
+      transform: translateX(-16px) scale(0.98);
+      transition:
+        opacity 0.12s 0s,
+        margin-left 0.12s 0s,
+        transform 0.22s cubic-bezier(.4,1.4,.6,1) 0s;
+    }
+    .dashboard-sidebar button svg {
+      transition: transform 0.28s cubic-bezier(.4,1.4,.6,1);
+    }
+    .dashboard-sidebar:hover button svg,
+    .dashboard-sidebar:focus-within button svg {
+      transform: translateX(14px) scale(1.12);
+    }
+    .chat-message.sent {
+      align-self: flex-end;
+      background: #007bff;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+      border-bottom-left-radius: 16px;
+    }
+    .chat-message.received {
+      align-self: flex-start;
+      background: #e4e6eb;
+      color: #222;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 16px;
+    }
+    .chat-input-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background-color: #f1f1f1;
+    }
+    #chat-input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    #chat-send {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #chat-send:hover {
+      background-color: #0056b3;
+    }
+    body.dark-mode {
+      background-color: #121212;
+      color: #000000;
+    }
+    body.dark-mode .dashboard-sidebar {
+      background: #10141f !important;
+      box-shadow: 2px 0 24px 0 #000, 0 0 0 1.5px #232f47;
+      border-right: 1.5px solid #232f47;
+    }
+    body.dark-mode .dashboard-sidebar:hover,
+    body.dark-mode .dashboard-sidebar:focus-within {
+      /* Remove dark background on hover in dark mode */
+      background: #10141f !important;
+      box-shadow: 4px 0 32px 0 #007bff, 0 0 0 2px #007bff;
+    }
+    body.dark-mode .dashboard-sidebar button {
+      color: #c8d4ee;
+    }
+    body.dark-mode .dashboard-sidebar button:hover {
+      background: #232f47;
+      color: #fff;
+    }
+    body.dark-mode .chatbox {
+      background-color: #1e1e1e;
+      border-left: 1px solid #333;
+    }
+    body.dark-mode .chat-message.sent {
+      background-color: #4a90e2;
+    }
+    body.dark-mode .chat-message.received {
+      background-color: #2a2a2a;
+    }
+    body.dark-mode .chat-input-area {
+      background-color: #1e1e1e;
+    }
+    body.dark-mode input,
+    body.dark-mode textarea {
+      background-color: #333;
+      color: #f1eaea;
+      border: 1px solid #555;
+    }
+    body.dark-mode .app-header {
+      background-color: #292626;
+      border-bottom: 1px solid #333;
+    }
+    body.dark-mode .header-center-text {
+      color: #ffffff;
+    }
+    @media (max-width: 600px) {
+      .dashboard-sidebar {
+        min-height: 100vh;
+        height: 100vh;
+      }
+      .calendar-app {
+        margin-left: 48px;
+        transition: margin-left 0.4s cubic-bezier(.4,1.4,.6,1);
+      }
+      .dashboard-sidebar:hover ~ .calendar-app,
+      .dashboard-sidebar:focus-within ~ .calendar-app {
+        margin-left: 140px;
+      }
+    }
+    .dashboard-sidebar:hover ~ .calendar-app,
+    .dashboard-sidebar:focus-within ~ .calendar-app {
+      margin-left: 180px;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <img src="logo.png" alt="Logo" class="app-logo" />
+    <div class="header-center-text">Peer Calendar</div>
+     <img src="profile.jpg" alt="Profile" class="profile-icon" />
+
+  </header>
+  <footer id="dynamic-footer" style="position:fixed;left:0;right:0;bottom:0;width:100%;background:#222;color:#fff;text-align:center;padding:2px 0;height:20px;transition:height 0.3s, padding 0.3s, font-size 0.3s;font-size:10px;z-index:150;">
+    Peer Calendar &copy; 2024
+  </footer>
+  <div class="app-container">
+    <nav class="dashboard-sidebar">
+      <!-- Example dashboard icons/buttons -->
+      <button title="Home">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
+          <path d="M4 13L14 5l10 8v9a2 2 0 0 1-2 2h-4v-6h-8v6H6a2 2 0 0 1-2-2v-9z" stroke="#444" stroke-width="2" fill="none"/>
+        </svg>
+        <span>Home</span>
+      </button>
+      <button title="Calendar">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
+          <rect x="4" y="7" width="20" height="16" rx="2" stroke="#444" stroke-width="2" fill="none"/>
+          <path d="M4 11h20" stroke="#444" stroke-width="2"/>
+        </svg>
+        <span style="font-family: 'Quicksand', sans-serif;">Calendar</span>
+      </button>
+      <!-- Removed redundant sidebar button span style to avoid conflicts -->
+      <button title="Tasks">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
+          <rect x="6" y="6" width="16" height="16" rx="3" stroke="#444" stroke-width="2" fill="none"/>
+          <path d="M10 14h8M10 18h5" stroke="#444" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Tasks</span>
+      </button>
+      <button title="Clock">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false">
+          <circle cx="14" cy="14" r="10" stroke="#444" stroke-width="2" fill="none"/>
+          <path d="M14 9v5l4 2" stroke="#444" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Clock</span>
+      </button>
+      <button title="Settings" style="margin-top:auto;">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" focusable="false" style="display:block;margin-left:0;margin-right:auto;transition:transform 0.22s cubic-bezier(.4,1.4,.6,1);">
+          <path d="M13.5 4.5a1 1 0 0 1 1 1V7h2a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h2V9a2 2 0 0 1 2-2h2V5.5a1 1 0 0 1 1-1z" stroke="#444" stroke-width="2" fill="none"/>
+        </svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+    <div class="calendar-app">
+      <div id="calendar-controls">
+      <button type="button" id="prev" style="display:none;">&larr;</button>
+      <button type="button" id="notification-btn" title="Notifications" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">
+      <!-- Custom SVG bell icon -->
+      <svg id="custom-bell-icon" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" focusable="false" style="display:block;cursor:pointer;" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11 20c1.1 0 2-.9 2-2h-4a2 2 0 002 2zm6-4V9a7 7 0 10-14 0v7l-1 1v1h16v-1l-1-1zm-2 .5H7V9a4 4 0 118 0v7.5z" fill="#444"/>
+      </svg>
+      </button>
+      <style>
+        .dashboard-sidebar {
+          transition: width 0.55s cubic-bezier(.4,1.4,.6,1), box-shadow 0.55s cubic-bezier(.4,1.4,.6,1), background 0.55s cubic-bezier(.4,1.4,.6,1);
+          border: none !important;
+          box-shadow: none !important;
+          position: relative;
+        }
+        .dashboard-sidebar:hover,
+        .dashboard-sidebar:focus-within {
+          transition: width 0.55s cubic-bezier(.4,1.4,.6,1), box-shadow 0.55s cubic-bezier(.4,1.4,.6,1), background 0.55s cubic-bezier(.4,1.4,.6,1);
+          border: none !important;
+          box-shadow: none !important;
+        }
+        .dashboard-sidebar button,
+        .dashboard-sidebar button span {
+          transition: 
+            width 0.55s cubic-bezier(.4,1.4,.6,1), 
+            min-width 0.55s cubic-bezier(.4,1.4,.6,1), 
+            max-width 0.55s cubic-bezier(.4,1.4,.6,1), 
+            gap 0.55s cubic-bezier(.4,1.4,.6,1), 
+            padding-left 0.55s cubic-bezier(.4,1.4,.6,1), 
+            background 0.35s cubic-bezier(.4,1.4,.6,1), 
+            color 0.35s cubic-bezier(.4,1.4,.6,1), 
+            margin-left 0.55s cubic-bezier(.4,1.4,.6,1);
+        }
+        /* Remove hiding of SVGs on hover so icons remain visible */
+        /* .dashboard-sidebar:hover button > svg:not(.sidebar-fade-icon),
+        .dashboard-sidebar:focus-within button > svg:not(.sidebar-fade-icon) {
+        /* Ensure SVG icons always remain visible on hover */
+          display: block;
+          width: 2px;
+          height: 80%;
+          background: #e0e0e0;
+          position: absolute;
+          left: 50%;
+          top: 10%;
+          border-radius: 1px;
+          transition: background 0.3s;
+          z-index: 1;
+          pointer-events: none;
+        }
+        .dashboard-sidebar:hover::after,
+        .dashboard-sidebar:focus-within::after {
+          background: #007bff;
+        }
+      </style>
+      <script>
+      // Add bell ring animation on click
+      (function() {
+        const bell = document.getElementById('custom-bell-icon');
+        let ringing = false;
+        bell.addEventListener('click', function(e) {
+      if (ringing) return;
+      ringing = true;
+      bell.style.transition = 'transform 0.08s cubic-bezier(.4,2,.6,1)';
+      let count = 0;
+      function ringStep() {
+        if (count < 6) {
+        bell.style.transform = `rotate(${count % 2 === 0 ? 18 : -18}deg)`;
+        setTimeout(() => {
+        bell.style.transform = 'rotate(0deg)';
+        count++;
+        setTimeout(ringStep, 40);
+        }, 40);
+        } else {
+        bell.style.transform = 'rotate(0deg)';
+        ringing = false;
+        }
+      }
+      ringStep();
+        });
+      })();
+      // Show #prev button only when footer is maximized
+      (function() {
+        const prevBtn = document.getElementById('prev');
+        const footer = document.getElementById('dynamic-footer');
+        function checkFooter() {
+        // Footer is maximized if height is close to 48px (allow small margin)
+        const h = parseFloat(getComputedStyle(footer).height);
+        if (h >= 46) {
+          prevBtn.style.display = '';
+        } else {
+          prevBtn.style.display = 'none';
+        }
+        }
+        window.addEventListener('scroll', checkFooter);
+        // Initial check
+        checkFooter();
+      })();
+
+      // Add zoom-in transition to About Us button, size matches maximized footer
+      (function() {
+        const footer = document.getElementById('dynamic-footer');
+        let aboutBtn = null;
+        function updateAboutBtn() {
+        const h = parseFloat(getComputedStyle(footer).height);
+        const padTop = parseFloat(getComputedStyle(footer).paddingTop);
+        const padBot = parseFloat(getComputedStyle(footer).paddingBottom);
+        const fontSize = getComputedStyle(footer).fontSize;
+        if (h >= 46) {
+          if (!aboutBtn) {
+          aboutBtn = document.createElement('button');
+          aboutBtn.id = 'about-us-btn';
+          aboutBtn.textContent = 'About Us';
+          aboutBtn.style.cssText = `
+            margin-left:12px;
+            background:#444;
+            color:#fff;
+            border:none;
+            border-radius:4px;
+            cursor:pointer;
+            transition:transform 0.22s cubic-bezier(.4,1.4,.6,1), opacity 0.18s, height 0.22s, padding 0.22s, font-size 0.22s;
+            transform:scale(0.85);
+            opacity:0;
+            vertical-align:middle;
+            display:inline-block;
+          `;
+          aboutBtn.onclick = function() {
+            alert('Peer Calendar\n\nA collaborative calendar and chat app.\n\nCreated by your team, 2024.');
+          };
+          footer.appendChild(aboutBtn);
+          // Force reflow and animate in
+          void aboutBtn.offsetWidth;
+          aboutBtn.style.transform = 'scale(1)';
+          aboutBtn.style.opacity = '1';
+          }
+          // Always update About Us button size to match footer
+          aboutBtn.style.height = h + 'px';
+          aboutBtn.style.paddingTop = padTop + 'px';
+          aboutBtn.style.paddingBottom = padBot + 'px';
+          aboutBtn.style.fontSize = fontSize;
+          aboutBtn.style.lineHeight = (h - padTop - padBot) + 'px';
+          aboutBtn.style.paddingLeft = '18px';
+          aboutBtn.style.paddingRight = '18px';
+        } else {
+          if (aboutBtn && aboutBtn.parentNode) {
+          // Animate out, then remove
+          aboutBtn.style.transform = 'scale(0.85)';
+          aboutBtn.style.opacity = '0';
+          setTimeout(() => {
+            if (aboutBtn && aboutBtn.parentNode) {
+            aboutBtn.parentNode.removeChild(aboutBtn);
+            aboutBtn = null;
+            }
+          }, 180);
+          }
+        }
+        }
+        window.addEventListener('scroll', updateAboutBtn);
+        // Initial check
+        updateAboutBtn();
+      })();
+
+      // Fade in footer as you scroll down
+      (function() {
+        const footer = document.getElementById('dynamic-footer');
+        footer.style.transition = (footer.style.transition ? footer.style.transition + ',' : '') + ' opacity 0.3s';
+        function updateFooterOpacity() {
+        // Fade in from scrollY 0 to 120px
+        const y = window.scrollY || window.pageYOffset;
+        let opacity = Math.min(Math.max((y - 0) / 120, 0), 1);
+        footer.style.opacity = opacity;
+        // Hide pointer events when invisible
+        footer.style.pointerEvents = opacity > 0 ? '' : 'none';
+        }
+        window.addEventListener('scroll', updateFooterOpacity);
+        // Initial state
+        updateFooterOpacity();
+      })();
+
+      // Move the event search textbox up in the page
+      (function() {
+        // Move #event-search before #notification-btn
+        const search = document.getElementById('event-search');
+        const notifBtn = document.getElementById('notification-btn');
+        if (search && notifBtn && notifBtn.parentNode) {
+        notifBtn.parentNode.insertBefore(search, notifBtn);
+        }
+      })();
+      </script>
+      <div id="view-label">Month</div>
+      <button type="button" id="next">&rarr;</button>
+      <button type="button" id="zoom-out">−</button>
+      <button type="button" id="zoom-in">+</button>
+      <input id="event-search" placeholder="Search…" />
+      <div id="notification-center" style="display:none; position:absolute; left:30px; top:70px; width:300px; background:#fff; border:1px solid #ccc; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.15); z-index:200;">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 16px; border-bottom:1px solid #eee;">
+      <span style="font-weight:bold;">Notifications</span>
+      <button type="button" id="close-notification-center" style="background:none;border:none;font-size:18px;cursor:pointer;">&times;</button>
+      </div>
+      <div style="padding:16px; color:#666;">No notifications.</div>
+      </div>
+      <script>
+      // Make notification center draggable
+
+      // Add zoom-in/out animation to notification center
+      (function() {
+      const notifCenter = document.getElementById('notification-center');
+      notifCenter.style.transition = "transform 0.22s cubic-bezier(.4,1.4,.6,1), opacity 0.18s";
+      notifCenter.style.transformOrigin = "top left";
+      notifCenter.style.opacity = "0";
+      notifCenter.style.transform = "scale(0.85)";
+
+      function showNotifCenter() {
+      notifCenter.style.display = "block";
+      // Force reflow for transition
+      void notifCenter.offsetWidth;
+      notifCenter.style.opacity = "1";
+      notifCenter.style.transform = "scale(1)";
+      }
+      function hideNotifCenter() {
+      notifCenter.style.opacity = "0";
+      notifCenter.style.transform = "scale(0.85)";
+      setTimeout(() => {
+      notifCenter.style.display = "none";
+      }, 180);
+      }
+
+      // Patch notification button logic
+      const notifBtn = document.getElementById('notification-btn');
+      const notifClose = document.getElementById('close-notification-center');
+      notifBtn.addEventListener('click', () => {
+      if (notifCenter.style.display === 'none' || notifCenter.style.opacity === "0") {
+      showNotifCenter();
+      } else {
+      hideNotifCenter();
+      }
+      });
+      notifClose.addEventListener('click', hideNotifCenter);
+      document.addEventListener('mousedown', (e) => {
+      if (
+      notifCenter.style.display === 'block' &&
+      !notifCenter.contains(e.target) &&
+      e.target !== notifBtn
+      ) {
+      hideNotifCenter();
+      }
+      });
+      })();
+      (function() {
+      const notifCenter = document.getElementById('notification-center');
+      let isDragging = false, offsetX = 0, offsetY = 0;
+
+      function enableDrag() {
+      // Drag handle is the header bar (first child div)
+      const dragHandle = notifCenter.querySelector('div');
+      if (!dragHandle) return;
+      dragHandle.style.cursor = "move";
+
+      dragHandle.addEventListener('mousedown', function(e) {
+      isDragging = true;
+      const rect = notifCenter.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      document.body.style.userSelect = "none";
+      notifCenter.style.zIndex = 999;
+      });
+
+      document.addEventListener('mousemove', function(e) {
+      if (isDragging) {
+      notifCenter.style.left = (e.clientX - offsetX) + "px";
+      notifCenter.style.top = (e.clientY - offsetY) + "px";
+      notifCenter.style.right = "auto";
+      notifCenter.style.position = "fixed"; // <-- Make sure it's fixed for dragging
+      }
+      });
+
+      document.addEventListener('mouseup', function() {
+      isDragging = false;
+      document.body.style.userSelect = "";
+      });
+      }
+
+      // Enable drag after DOMContentLoaded
+      if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", enableDrag);
+      } else {
+      enableDrag();
+      }
+      })();
+      </script>
+      <button type="button" id="toggle-dark-mode" title="Toggle dark mode" style="background:none;border:none;cursor:pointer;padding:0 8px;vertical-align:middle;">
+      <!-- Crescent moon SVG: much larger hole for thinner crescent -->
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true" focusable="false" style="display:block;" xmlns="http://www.w3.org/2000/svg">
+        <!-- Crescent moon: outer arc, inner arc much closer to center for a thinner crescent -->
+        <path
+      d="M19 13a8 8 0 1 1-8-8c0 5 3.5 8 8 8z"
+      fill="none"
+      stroke="#444"
+      stroke-width="2.2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+        />
+      </svg>
+      </button>
+      </div>
+      <div id="calendar-view"></div>
+      <div id="calendar"></div>
+    </div>
+    <!-- Removed duplicate About Us button script to prevent two buttons from appearing -->
+
+    <div id="event-modal" class="hidden">
+      <div id="event-modal-content">
+        <div id="event-modal-header">
+          <span id="event-modal-date"></span>
+          <button type="button" id="event-modal-close">&times;</button>
+        </div>
+        <textarea id="event-modal-text" placeholder="Add a note..."></textarea>
+        <button type="button" id="event-modal-save">Save</button>
+      </div>
+    </div>
+
+    <!-- Chat Panel -->
+    <div class="chatbox">
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Type a message…" />
+        <button type="button" id="chat-send">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+<!-- Fix dashboard sidebar vertical line to be truly full height -->
+<style>
+  /* Sidebar vertical line: full height of viewport, at far left of screen */
+  .dashboard-sidebar::after {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 100vh;
+    background: #007bff; /* blue line */
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 2px;
+    transition: background 0.4s cubic-bezier(.4,1.4,.6,1), height 0.4s cubic-bezier(.4,1.4,.6,1);
+    z-index: 101;
+    pointer-events: none;
+    box-shadow: 0 0 8px 0 #007bff;
+  }
+  .dashboard-sidebar {
+    min-height: 100vh;
+    height: 100vh;
+    width: 48px;
+    min-width: 48px;
+    max-width: 48px;
+    transition: width 0.4s cubic-bezier(.4,1.4,.6,1), min-width 0.4s cubic-bezier(.4,1.4,.6,1), max-width 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1), background 0.4s cubic-bezier(.4,1.4,.6,1);
+    background: #f3f4f7; /* changed from #1a2233 to a light grey */
+    box-shadow: 2px 0 16px 0 rgba(34,44,56,0.18), 0 0 0 1px #e0e0e0;
+    border-right: 1.5px solid #e0e0e0;
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+  }
+  .dashboard-sidebar:hover,
+  .dashboard-sidebar:focus-within {
+    background: #f5f5f5;
+    box-shadow: 4px 0 24px 0 rgba(34,44,56,0.28), 0 0 0 1.5px #007bff;
+    width: 180px;
+    min-width: 180px;
+    max-width: 180px;
+    transition: background 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1), width 0.4s cubic-bezier(.4,1.4,.6,1), min-width 0.4s cubic-bezier(.4,1.4,.6,1), max-width 0.4s cubic-bezier(.4,1.4,.6,1);
+  }
+  .dashboard-sidebar button,
+  .dashboard-sidebar button span {
+    transition: 
+      width 0.4s cubic-bezier(.4,1.4,.6,1), 
+      min-width 0.4s cubic-bezier(.4,1.4,.6,1), 
+      max-width 0.4s cubic-bezier(.4,1.4,.6,1), 
+      gap 0.4s cubic-bezier(.4,1.4,.6,1), 
+      padding-left 0.4s cubic-bezier(.4,1.4,.6,1), 
+      background 0.4s cubic-bezier(.4,1.4,.6,1), 
+      color 0.4s cubic-bezier(.4,1.4,.6,1), 
+      margin-left 0.4s cubic-bezier(.4,1.4,.6,1);
+  }
+  .dashboard-sidebar button {
+    background: none;
+    color: #222c38;
+    position: relative;
+    overflow: visible;
+  }
+  .dashboard-sidebar button:hover {
+    background: #e9e9e9;
+    color: #007bff;
+  }
+  .dashboard-sidebar:hover::after,
+  .dashboard-sidebar:focus-within::after {
+    background: #007bff;
+    box-shadow: 0 0 16px 0 #007bff;
+    transition: background 0.4s cubic-bezier(.4,1.4,.6,1), box-shadow 0.4s cubic-bezier(.4,1.4,.6,1);
+  }
+  /* Show icon labels when sidebar is expanded (hover or focus) */
+  .dashboard-sidebar button span {
+    opacity: 0;
+    margin-left: 0;
+    font-size: 15px;
+    color: #444;
+    white-space: nowrap;
+    font-family: 'Quicksand', sans-serif;
+    display: inline;
+    transform: translateX(-16px) scale(0.98);
+    transition:
+      opacity 0.22s 0.36s,
+      margin-left 0.22s 0.36s,
+      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
+  }
+  .dashboard-sidebar:hover button span,
+  .dashboard-sidebar:focus-within button span {
+    display: inline;
+    opacity: 1;
+    margin-left: 8px;
+  }
+
+  /* Ensure SVG icons are always visible */
+  .dashboard-sidebar button svg {
+    display: block;
+    margin-right: 0;
+    transition: margin 0.22s;
+    vertical-align: middle;
+  }
+  .dashboard-sidebar:hover button span,
+  .dashboard-sidebar:focus-within button span {
+    display: inline;
+    opacity: 1;
+    margin-left: 8px;
+    transform: translateX(0) scale(1);
+    transition:
+      opacity 0.22s 0.36s,
+      margin-left 0.22s 0.36s,
+      transform 0.32s cubic-bezier(.4,1.4,.6,1) 0.36s;
+  }
+    .dashboard-sidebar:not(:hover):not(:focus-within) button span {
+      opacity: 0;
+      margin-left: 0;
+      transform: translateX(-16px) scale(0.98);
+      transition:
+        opacity 0.12s 0s,
+        margin-left 0.12s 0s,
+        transform 0.22s cubic-bezier(.4,1.4,.6,1) 0s;
+      display: inline;
+    }
+
+  /* Make the clock fill the calendar area */
+  #clock-container {
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    min-width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+    position: relative;
+    /* Remove margin-top from JS, handled here */
+  }
+  #analog-clock-canvas {
+    width: 90%;
+    height: auto;
+    max-width: 600px;
+    max-height: 80vh;
+    aspect-ratio: 1/1;
+    background: #f8fafd;
+    border-radius: 50%;
+    box-shadow: 0 4px 32px 0 rgba(0,123,255,0.10);
+    display: block;
+  }
+  #clock-date {
+    font-size: 1.5em;
+    color: #444;
+    margin-top: 32px;
+    font-family: 'Quicksand',sans-serif;
+    text-align: center;
+    width: 100%;
+  }
+  @media (max-width: 900px) {
+    #analog-clock-canvas {
+      max-width: 95vw;
+      max-height: 60vw;
+    }
+    #clock-container {
+      min-width: 0;
+      min-height: 300px;
+    }
+  }
+</style>
+<!-- --- CLOCK LOGIC --- -->
+<script>
+(function() {
+  // Elements
+  const calendarApp = document.querySelector('.calendar-app');
+  const calendarView = document.getElementById('calendar-view');
+  const calendar = document.getElementById('calendar');
+  const calendarControls = document.getElementById('calendar-controls');
+  let clockContainer = null;
+  let clockInterval = null;
+
+  function drawAnalogClock(ctx, radius) {
+    ctx.clearRect(-radius - 20, -radius - 20, (radius + 20) * 2, (radius + 20) * 2);
+
+    // Draw face
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = "#fff";
+    ctx.shadowColor = "#007bff";
+    ctx.shadowBlur = 12;
+    ctx.fill();
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = "#007bff";
+    ctx.stroke();
+    ctx.restore();
+
+    // Draw hour marks
+    for (let num = 1; num <= 12; num++) {
+      let ang = num * Math.PI / 6;
+      ctx.save();
+      ctx.rotate(ang);
+      ctx.translate(0, -radius * 0.82);
+      ctx.rotate(-ang);
+      ctx.font = `${radius * 0.22}px Quicksand, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#444";
+      ctx.fillText(num.toString(), 0, 0);
+      ctx.restore();
+    }
+
+    // Draw minute marks
+    ctx.save();
+    ctx.strokeStyle = "#bbb";
+    for (let i = 0; i < 60; i++) {
+      let ang = i * Math.PI / 30;
+      ctx.beginPath();
+      ctx.rotate(ang);
+      ctx.moveTo(0, -radius * 0.95);
+      ctx.lineTo(0, -radius * 0.9);
+      ctx.stroke();
+      ctx.rotate(-ang);
+    }
+    ctx.restore();
+
+    // Get current time
+    const now = new Date();
+    let hour = now.getHours();
+    let minute = now.getMinutes();
+    let second = now.getSeconds();
+
+    // Hour hand
+    ctx.save();
+    ctx.strokeStyle = "#007bff";
+    ctx.lineWidth = radius * 0.09;
+    ctx.lineCap = "round";
+    let hourAngle = ((hour % 12) + minute / 60 + second / 3600) * Math.PI / 6;
+    ctx.rotate(hourAngle);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, -radius * 0.55);
+    ctx.stroke();
+    ctx.restore();
+
+    // Minute hand
+    ctx.save();
+    ctx.strokeStyle = "#222";
+    ctx.lineWidth = radius * 0.06;
+    ctx.lineCap = "round";
+    let minAngle = (minute + second / 60) * Math.PI / 30;
+    ctx.rotate(minAngle);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, -radius * 0.75);
+    ctx.stroke();
+    ctx.restore();
+
+    // Second hand
+    ctx.save();
+    ctx.strokeStyle = "#e74c3c";
+    ctx.lineWidth = radius * 0.025;
+    ctx.lineCap = "round";
+    let secAngle = second * Math.PI / 30;
+    ctx.rotate(secAngle);
+    ctx.beginPath();
+    ctx.moveTo(0, radius * 0.18);
+    ctx.lineTo(0, -radius * 0.82);
+    ctx.stroke();
+    ctx.restore();
+
+    // Center dot
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 0.07, 0, 2 * Math.PI);
+    ctx.fillStyle = "#007bff";
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function showClock() {
+    // Hide calendar
+    calendar.style.display = 'none';
+    calendarView.style.display = 'none';
+    if (calendarControls) calendarControls.style.display = 'none';
+    // Create clock if not exists
+    if (!clockContainer) {
+      clockContainer = document.createElement('div');
+      clockContainer.id = 'clock-container';
+
+      // Make clock container fill the calendar-app
+      clockContainer.style.width = '100%';
+      clockContainer.style.height = '100%';
+      clockContainer.style.minHeight = '500px';
+      clockContainer.style.minWidth = '350px';
+      clockContainer.style.display = 'flex';
+      clockContainer.style.flexDirection = 'column';
+      clockContainer.style.alignItems = 'center';
+      clockContainer.style.justifyContent = 'center';
+      clockContainer.style.margin = '0';
+      clockContainer.style.padding = '0';
+      clockContainer.style.boxSizing = 'border-box';
+      clockContainer.style.position = 'relative';
+
+      // Responsive sizing
+      let canvas = document.createElement('canvas');
+      canvas.id = 'analog-clock-canvas';
+      // Set canvas size to match calendar-app size
+      function resizeCanvas() {
+        // Get calendar-app size
+        const parent = calendarApp;
+        let w = parent.clientWidth;
+        let h = parent.clientHeight;
+        // Use the smaller of width/height, minus some padding
+        let size = Math.min(w, h, 600) * 0.9;
+        if (window.innerWidth < 900) {
+          size = Math.min(w, h, window.innerWidth, window.innerHeight) * 0.95;
+        }
+        size = Math.max(size, 220);
+        canvas.width = Math.round(size);
+        canvas.height = Math.round(size);
+        canvas.style.width = size + 'px';
+        canvas.style.height = size + 'px';
+      }
+
+      // Call resizeCanvas BEFORE appending to DOM or drawing
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      canvas.style.background = "#f8fafd";
+      canvas.style.borderRadius = "50%";
+      canvas.style.boxShadow = "0 4px 32px 0 rgba(0,123,255,0.10)";
+      canvas.style.display = "block";
+      clockContainer.appendChild(canvas);
+
+      const dateEl = document.createElement('div');
+      dateEl.id = 'clock-date';
+      dateEl.style.fontSize = '1.5em';
+      dateEl.style.color = '#444';
+      dateEl.style.marginTop = '32px';
+      dateEl.style.fontFamily = "'Quicksand',sans-serif";
+      dateEl.style.textAlign = 'center';
+      dateEl.style.width = '100%';
+      clockContainer.appendChild(dateEl);
+
+      calendarApp.insertBefore(clockContainer, calendarApp.firstChild.nextSibling);
+    }
+    clockContainer.style.display = '';
+    // Start interval
+    if (!clockInterval) {
+      // Track last known parent size to avoid repeated resizing
+      let lastParentWidth = null;
+      let lastParentHeight = null;
+
+      function resizeCanvasIfNeeded() {
+        const canvas = document.getElementById('analog-clock-canvas');
+        if (!canvas) return;
+        const parent = calendarApp;
+        let w = parent.clientWidth;
+        let h = parent.clientHeight;
+        let size = Math.min(w, h, 600) * 0.9;
+        if (window.innerWidth < 900) {
+          size = Math.min(w, h, window.innerWidth, window.innerHeight) * 0.95;
+        }
+        size = Math.max(size, 220);
+
+        // Only set width/height if changed, and reset transform to avoid cumulative scaling
+        const newSize = Math.round(size);
+        if (canvas.width !== newSize || canvas.height !== newSize) {
+          canvas.width = newSize;
+          canvas.height = newSize;
+          canvas.style.width = newSize + 'px';
+          canvas.style.height = newSize + 'px';
+        }
+      }
+
+      function updateClock() {
+        resizeCanvasIfNeeded();
+        const canvas = document.getElementById('analog-clock-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        drawAnalogClock(ctx, canvas.width / 2 - 12);
+        ctx.restore();
+        // Date
+        const now = new Date();
+        document.getElementById('clock-date').textContent = now.toLocaleDateString(undefined, {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+      }
+      updateClock();
+      clockInterval = setInterval(updateClock, 1000);
+      window.addEventListener('resize', function() {
+        // Reset last known size so resize happens
+        lastParentWidth = null;
+        lastParentHeight = null;
+        updateClock();
+      });
+    }
+  }
+
+  function hideClock() {
+    if (clockContainer) clockContainer.style.display = 'none';
+    if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+    calendar.style.display = '';
+    calendarView.style.display = '';
+    if (calendarControls) calendarControls.style.display = '';
+    window.removeEventListener('resize', null);
+  }
+
+  // Track state
+  let clockActive = false;
+
+  // Find the "Clock" button in the sidebar
+  let clockBtn = null;
+  document.querySelectorAll('.dashboard-sidebar button').forEach(btn => {
+    if (
+      btn.textContent.trim().toLowerCase().includes('clock') ||
+      (btn.querySelector('span') && btn.querySelector('span').textContent.trim().toLowerCase() === 'clock')
+    ) {
+      clockBtn = btn;
+    }
+  });
+
+  if (clockBtn) {
+    clockBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      clockActive = !clockActive;
+      if (clockActive) {
+        showClock();
+      } else {
+        hideClock();
+      }
+    });
+  }
+
+  // Hide clock if user clicks any other sidebar button
+  document.querySelectorAll('.dashboard-sidebar button').forEach(btn => {
+    if (btn !== clockBtn) {
+      btn.addEventListener('click', () => {
+        if (clockActive) {
+          clockActive = false;
+          hideClock();
+        }
+      });
+    }
+  });
+})();
+</script>

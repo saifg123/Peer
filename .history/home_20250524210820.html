@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Peer – Home</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Quicksand:wght@300..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* RESET & BODY */
+    * { box-sizing: border-box; margin:0; padding:0 }
+    html, body { height:100%; font-family:'Quicksand',sans-serif }
+    body {
+      position: relative;
+      background: linear-gradient(135deg,#b3b3f5 0%,#ffe3e3 100%);
+      transition: background 2s ease;
+    }
+
+    /* BLOBS & STRIPES (unchanged) */
+    body::before,body::after{ /*…*/ }
+    /* stripe overlay… */
+
+    /* LAYOUT */
+    .container {
+      max-width:800px; margin:0 auto; padding:24px;
+      display:flex; flex-direction:column;
+      align-items:center; gap:32px; position:relative; z-index:2;
+    }
+    .header { /*…*/ }
+    .header-title{ /*…*/ }
+    .guest-icon{ /*…*/ }
+
+    /* BOXES WRAPPER */
+    .boxes {
+      display:flex; gap:32px; justify-content:center; margin-top:32px;
+      position:relative;
+    }
+
+    /* COMMON BOX STYLES */
+    .box {
+      background:#fff; border-radius:12px;
+      box-shadow:0 2px 12px rgba(0,0,0,0.08);
+      padding:40px 32px; text-align:center;
+      font-size:1.2rem; color:#222;
+      transition:background .3s;
+      flex:none; width:360px;  /* fixed width! */
+    }
+    .box:hover { background:#b3b3f5 }
+    .continue-box { cursor:pointer }
+    .to-do-box { display:flex;align-items:center;justify-content:center }
+
+    /* NEW BOX (start collapsed) */
+    .new-box {
+      width:0; opacity:0; overflow:hidden;
+    }
+
+    /* FADE-IN */
+    @keyframes fadeIn {
+      from {opacity:0;transform:translateY(10px)}
+      to   {opacity:1;transform:translateY(0)}
+    }
+    .fade-in {
+      opacity:0;
+      animation:fadeIn .5s ease forwards;
+    }
+    .header.fade-in       {animation-delay:0s}
+    .continue-box.fade-in {animation-delay:.5s}
+    .to-do-box.fade-in    {animation-delay:1s}
+
+    /* SHIFT (step 2) */
+    @keyframes shiftLeft {
+      to { transform: translateX(-392px) } /* half of (360*2 + 32) */
+    }
+
+    /* POP (step 3) */
+    @keyframes expandWidth {
+      from { width: 0; opacity: 0 }
+      to   { width: calc(360px * 2 + 32px); opacity: 1 }
+    }
+
+    /* APPLY ON .animate */
+    body.animate .continue-box,
+    body.animate .to-do-box {
+      animation: shiftLeft .8s cubic-bezier(.65,0,.35,1) forwards;
+      animation-delay: 0s;
+    }
+    body.animate .new-box {
+      animation: expandWidth 1s cubic-bezier(.65,0,.35,1) forwards;
+      animation-delay: .8s; /* wait until shift completes */
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // click handler
+      const c = document.querySelector('.continue-box');
+      if(c) c.addEventListener('click', () => location.href = 'app.html');
+
+      // trigger fade-ins
+      document.querySelectorAll('.fade-in')
+        .forEach(el => el.classList.add('fade-in'));
+
+      // kick off shift+pop 1.6s after load
+      setTimeout(() => document.body.classList.add('animate'), 1600);
+    });
+
+    window.addEventListener('load', () => {
+      // background → white
+      document.body.style.background = 'linear-gradient(135deg,#fff 0%,#f0f0f0 100%)';
+      // adjust blobs…
+      setTimeout(() => {
+        const s=document.createElement('style');
+        s.textContent=`
+          body::before{background:#f0f0f0!important;filter:blur(100px)!important}
+          body::after{background:#fff!important;filter:blur(80px)!important}
+        `;
+        document.head.appendChild(s);
+      },0);
+    });
+  </script>
+</head>
+
+<body>
+  <div class="stripe-overlay"></div>
+  <div class="container">
+    <div class="header fade-in">
+      <div class="header-title">
+        Peer <span class="header-home">Welcome to Peer</span>
+      </div>
+      <div class="guest-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4 0-7 2-7 4v2h14v-2c0-2-3-4-7-4z"/></svg>
+      </div>
+    </div>
+    <div class="boxes">
+      <div class="continue-box box fade-in">
+        Continue where you left off, ----.
+      </div>
+      <div class="to-do-box box fade-in">
+        To-do
+      </div>
+      <div class="box new-box">
+        New Big Box!
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+

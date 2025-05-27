@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notion Calendar with Chat</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f8f7f5;
+      color: #2e2e2e;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      height: 50px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid #e0e0e0;
+      z-index: 2;
+    }
+
+    main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    nav, .calendar-sidebar, .chat-sidebar, .todo-sidebar {
+      width: 240px;
+      background: #fbfaf8;
+      border-right: 1px solid #e0e0e0;
+      padding: 16px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    nav h2, .calendar-sidebar h2, .chat-sidebar h2, .todo-sidebar h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      color: #888;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    nav li {
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    nav li:hover,
+    nav li.active {
+      background: #eae9e6;
+    }
+
+    .content {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+
+    .block {
+      margin-bottom: 12px;
+      padding: 8px;
+      border-radius: 6px;
+    }
+
+    .block[contenteditable]:focus {
+      outline: none;
+      background: #fffbe6;
+    }
+
+    button.add-block {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #ededed;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .calendar-sidebar, .chat-sidebar, .todo-sidebar {
+      display: none;
+    }
+
+    .calendar-sidebar select,
+    .todo-sidebar input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 12px;
+    }
+
+    .calendar-sidebar button,
+    .todo-sidebar button {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      margin-top: 8px;
+      background: #e0e0e0;
+      border: none;
+      cursor: pointer;
+    }
+
+    .timeline {
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .hour-block {
+      border-top: 1px solid #ddd;
+      height: 60px;
+      padding: 4px 8px;
+      position: relative;
+    }
+
+    .hour-label {
+      font-size: 12px;
+      color: #666;
+      position: absolute;
+      top: 4px;
+      left: 8px;
+    }
+
+    .todo-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .todo-list li {
+      padding: 8px;
+      border-radius: 6px;
+      background: #fff;
+      margin-bottom: 8px;
+    }
+
+    .todo-list li input {
+      margin-right: 8px;
+    }
+
+    .todo-sidebar {
+      border-left: 1px solid #e0e0e0;
+    }
+
+    .chat-sidebar textarea {
+      width: 100%;
+      height: 300px;
+      padding: 8px;
+      resize: none;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+
+    .chat-sidebar input {
+      width: 100%;
+      margin-top: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Notion Clone</div>
+    <div>User ▾</div>
+  </header>
+  <main>
+    <nav id="defaultSidebar">
+      <h2>Pages</h2>
+      <ul>
+        <li onclick="showView('notes')" class="active">📝 Notes</li>
+        <li onclick="showView('calendar')">📅 Calendar</li>
+        <li onclick="showView('tasks')">✅ Tasks</li>
+        <li onclick="showView('wiki')">📚 Wiki</li>
+      </ul>
+    </nav>
+
+    <div class="calendar-sidebar" id="calendarSidebar">
+      <h2>Select Date</h2>
+      <select>
+        <option>May 2025</option>
+        <option>June 2025</option>
+      </select>
+      <select>
+        <option>Mon, May 26</option>
+        <option>Tue, May 27</option>
+        <option>Wed, May 28</option>
+      </select>
+      <button onclick="showView('notes')">← Back to Main App</button>
+    </div>
+
+    <div class="chat-sidebar" id="chatSidebar">
+      <h2>Chat with AI</h2>
+      <textarea placeholder="Ask me anything..."></textarea>
+      <input type="text" placeholder="Type a message..." />
+      <button onclick="toggleChat(false)">← Back to Calendar</button>
+    </div>
+
+    <div class="content" id="mainContent">
+      <!-- Notes View -->
+      <div id="notesView">
+        <div class="page-title" contenteditable="true">Untitled Page</div>
+        <div class="blocks" id="blocks">
+          <div class="block" contenteditable="true">Type '/' for commands</div>
+        </div>
+        <button class="add-block" onclick="addBlock()">+ Add block</button>
+      </div>
+
+      <!-- Calendar Timeline -->
+      <div class="timeline" id="calendarTimeline">
+        <div class="page-title">Calendar Timeline</div>
+        <div id="timelineHours"></div>
+      </div>
+    </div>
+
+    <div class="todo-sidebar" id="todoSidebar">
+      <h2>To-Do List</h2>
+      <input type="text" placeholder="Add task..." onkeydown="addTodo(event)"/>
+      <ul class="todo-list" id="todoList"></ul>
+      <button onclick="toggleChat(true)">💬 Chat</button>    </div>
+  </main>
+
+  <script>
+    function addBlock() {
+      const blocks = document.getElementById('blocks');
+      const newBlock = document.createElement('div');
+      newBlock.className = 'block';
+      newBlock.contentEditable = true;
+      newBlock.textContent = 'New block';
+      blocks.appendChild(newBlock);
+      newBlock.focus();
+    }
+
+    function showView(view) {
+      document.querySelectorAll("nav li").forEach(li => li.classList.remove("active"));
+      const tabMap = { notes: 0, calendar: 1, tasks: 2, wiki: 3 };
+      document.querySelectorAll("nav li")[tabMap[view]].classList.add("active");
+
+      const notesView = document.getElementById("notesView");
+      const timeline = document.getElementById("calendarTimeline");
+      const defaultSidebar = document.getElementById("defaultSidebar");
+      const calendarSidebar = document.getElementById("calendarSidebar");
+      const todoSidebar = document.getElementById("todoSidebar");
+      const chatSidebar = document.getElementById("chatSidebar");
+
+      if (view === 'calendar') {
+        notesView.style.display = 'none';
+        timeline.style.display = 'block';
+        defaultSidebar.style.display = 'none';
+        calendarSidebar.style.display = 'block';
+        chatSidebar.style.display = 'none';
+        todoSidebar.style.display = 'block';
+        renderTimeline();
+      } else {
+        notesView.style.display = 'block';
+        timeline.style.display = 'none';
+        defaultSidebar.style.display = 'block';
+        calendarSidebar.style.display = 'none';
+        chatSidebar.style.display = 'none';
+        todoSidebar.style.display = 'none';
+      }
+    }
+
+    function renderTimeline() {
+      const container = document.getElementById("timelineHours");
+      container.innerHTML = '';
+      for (let i = 0; i < 24; i++) {
+        const block = document.createElement("div");
+        block.className = "hour-block";
+        block.innerHTML = `<div class="hour-label">${String(i).padStart(2, '0')}:00</div>`;
+        container.appendChild(block);
+      }
+    }
+
+    function toggleChat(enable) {
+      const calendarSidebar = document.getElementById("calendarSidebar");
+      const chatSidebar = document.getElementById("chatSidebar");
+      calendarSidebar.style.display = enable ? "none" : "block";
+      chatSidebar.style.display = enable ? "block" : "none";
+    }
+
+    function addTodo(event) {
+      if (event.key === "Enter" && event.target.value.trim()) {
+        const task = event.target.value.trim();
+        const li = document.createElement("li");
+        li.innerHTML = `<input type="checkbox"> ${task}`;
+        document.getElementById("todoList").appendChild(li);
+        event.target.value = '';
+      }
+    }
+
+    renderTimeline();
+  </script>
+</body>
+</html>

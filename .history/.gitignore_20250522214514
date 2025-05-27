@@ -1,0 +1,21 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Firebase credentials 
+firebase.js
+
+# Logs and system files
+*.log
+.DS_Store
+
+# VSCode settings 
+.vscode/
+
+# Compiled outputs / cache
+dist/
+build/
+.parcel-cache/
+.next/

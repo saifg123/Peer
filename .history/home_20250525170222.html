@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Peer – Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Quicksand:wght@300..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: 'Quicksand', sans-serif; }
+    body {
+      position: relative;
+      background: linear-gradient(135deg, #b3b3f5 0%, #ffe3e3 100%);
+      transition: background 2s ease;
+      overflow-x: hidden;
+    }
+    body::before, body::after {
+      content: ""; position: absolute; border-radius: 50%; opacity: 0.5; animation: float 12s ease-in-out infinite alternate;
+    }
+    body::before {
+      width: 500px; height: 500px; background: #fff; top: -200px; left: -200px; filter: blur(150px);
+    }
+    body::after {
+      width: 300px; height: 300px; background: #3f51b5; top: 60%; left: 70%; filter: blur(100px); animation-duration: 8s; animation-delay: 2s;
+    }
+    @keyframes float { to { transform: translate3d(50px,50px,0) scale(1.1); opacity: 0.7; } }
+    .stripe-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 1; background-image: repeating-linear-gradient(45deg,rgba(255,255,255,0.05) 0 2px,transparent 2px 4px); }
+    .container { position: relative; max-width: 800px; margin: 0 auto; padding: 24px; min-height: 400vh; display: flex; flex-direction: column; align-items: center; gap: 32px; z-index: 2; }
+    .header { width: 100%; display: flex; justify-content: space-between; align-items: center; background: #3f51b5; padding: 18px 32px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .header-title { font-family: 'Lexend', sans-serif; color: #fff; font-size: 1.5rem; }
+    .header-home  { font-size: 2.2rem; font-weight: 400; letter-spacing: 0.5px; }
+    .guest-icon  { width: 32px;height:32px;background:#f5f6fa;border-radius:50%;display:flex;align-items:center;justify-content:center; }
+    .guest-icon svg { width:22px;height:22px;fill:#3f51b5; }
+    .boxes { display:flex;gap:32px;width:100%;justify-content:center; }
+    .box { background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);padding:40px 32px;flex:1 1 0;max-width:360px;text-align:center;font-size:1.2rem;color:#222;transition:background .3s;cursor:default; }
+    .box:hover { background:#b3b3f5; }
+    .continue-box { cursor:pointer; }
+    .to-do-box  { display:flex;align-items:center;justify-content:center; }
+    .new-box { flex:0 0 360px;width:360px;height:0;opacity:0;overflow:hidden;transition:height 1s ease .8s,opacity .5s ease .7s; }
+    body.animate .continue-box, body.animate .to-do-box { transform: translateX(-392px); transition: transform .5s ease; }
+    body.animate .new-box { height: calc(2 * var(--box-height) + var(--box-gap)); opacity:1; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+    .fade-in { opacity:0; animation: fadeIn .5s ease forwards; }
+    .header.fade-in { animation-delay:0s; }
+    .continue-box.fade-in { animation-delay:.5s; }
+    .to-do-box.fade-in { animation-delay:1s; }
+    :root { --box-gap:32px; }
+    .icons-section { position: relative; width:100%; height:100vh; margin-top:32px; overflow:hidden; }
+    .icons-section .icon {
+      position: absolute;
+      width: 100px;
+      height: 40px;
+      background: #fff;
+      border-radius: 20px;
+      opacity: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #3f51b5;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transform: scale(0.5);
+      transition: opacity .4s ease, transform .4s ease;
+    }
+    .icons-section .icon.show { opacity: 1; transform: scale(1); }
+    .icons-section svg { position:absolute; top:0;left:0;width:100%;height:100%;pointer-events:none; overflow:visible; }
+    .central-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #4caf50;
+      color: white;
+      padding: 14px 32px;
+      border-radius: 999px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+    .central-button.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .timeline-section {
+      width: 100%;
+      overflow-x: scroll;
+      padding: 60px 0;
+      display: flex;
+      gap: 24px;
+      scroll-snap-type: x mandatory;
+    }
+    .timeline-card {
+      flex: 0 0 280px;
+      scroll-snap-align: start;
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .timeline-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="stripe-overlay"></div>
+  <div class="container">
+    <div class="header fade-in">
+      <div class="header-title">Peer <span class="header-home">Welcome to Peer</span></div>
+      <div class="guest-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4 0-7 2-7 4v2h14v-2c0-2-3-4-7-4z"/></svg></div>
+    </div>
+    <div class="boxes">
+      <div class="continue-box box fade-in">Continue where you left off, ----.</div>
+      <div class="to-do-box box fade-in">To-do</div>
+      <div class="box new-box">New Big Box!</div>
+    </div>
+    <div class="icons-section" id="icons-section">
+      <svg id="icon-lines" xmlns="http://www.w3.org/2000/svg"></svg>
+      <button id="centralButton" class="central-button">Get things done</button>
+    </div>
+    <div class="timeline-section" id="timeline">
+      <div class="timeline-card">Project kickoff</div>
+      <div class="timeline-card">Initial planning</div>
+      <div class="timeline-card">Design phase</div>
+      <div class="timeline-card">Development</div>
+      <div class="timeline-card">Testing</div>
+      <div class="timeline-card">Launch</div>
+    </div>
+  </div>
+ <script>
+(function(){
+  const iconsSection = document.getElementById('icons-section');
+  const svg = document.getElementById('icon-lines');
+  const centralBtn = document.getElementById('centralButton');
+  const assignmentNames = [
+    "Math HW", "Science Lab", "Essay Draft", "Group Project", "Reading", "Quiz Review",
+    "Physics Notes", "Biology Worksheet", "History Timeline", "Art Project",
+    "Music Theory", "Geometry", "Literature", "Coding Exercise", "Chemistry HW"
+  ];
+
+  let injected = false;
+
+  // Deterministic pseudo-random generator (seeded)
+  function seededRandom(seed) {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  }
+
+  function genPositions(count, size) {
+    const positions = [];
+    let attempts = 0;
+    for (let i = 0; i < count; i++) {
+      let valid = false;
+      let x = 0, y = 0;
+      while (!valid && attempts < 1000) {
+        attempts++;
+        x = seededRandom(i * 2 + 1) * (iconsSection.clientWidth - size);
+        y = seededRandom(i * 2 + 2) * (iconsSection.clientHeight - size);
+        valid = positions.every(p => Math.hypot(p.x - x, p.y - y) >= size * 1.2);
+      }
+      positions.push({ x, y });
+    }
+    return positions;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (injected || window.scrollY <= window.innerHeight * 0.5) return;
+    injected = true;
+    const count = 15, size = 100;
+    const posList = genPositions(count, size);
+
+    posList.forEach((pos, i) => {
+      const icon = document.createElement('div');
+      icon.className = 'icon';
+      icon.textContent = assignmentNames[i % assignmentNames.length];
+      icon.style.left = pos.x + 'px';
+      icon.style.top = pos.y + 'px';
+      iconsSection.appendChild(icon);
+
+      setTimeout(() => {
+        icon.classList.add('show');
+
+        const ix = pos.x + size / 2;
+        const iy = pos.y + 20;
+        const ex = iconsSection.clientWidth / 2;
+        const ey = iconsSection.clientHeight / 2;
+
+        // Deterministic control point
+        const offsetX = (seededRandom(i * 3 + 1) - 0.5) * 60;
+        const offsetY = (seededRandom(i * 3 + 2) - 0.5) * 60;
+
+        const cpX = ix + (ex - ix) * 0.4 + offsetX;
+        const cpY = iy + (ey - iy) * 0.4 + offsetY;
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M${ix},${iy} Q${cpX},${cpY} ${ex},${ey}`);
+        path.setAttribute('stroke', 'rgba(255,255,255,0.7)');
+        path.setAttribute('stroke-width', '1.5');
+        path.setAttribute('fill', 'none');
+        svg.appendChild(path);
+
+        if (i === posList.length - 1) {
+          setTimeout(() => centralBtn.classList.add('show'), 1000);
+        }
+      }, 300 + i * 200);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

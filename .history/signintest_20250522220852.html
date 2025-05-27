@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+  <style>
+  body {
+      margin: 0;
+      font-family: 'Righteous', cursive;
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .sign-in-container {
+      text-align: center;
+    }
+
+    .guest-avatar-large {
+      width: 120px;
+      height: 120px;
+      border: 4px solid #222;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 30px;
+    }
+
+    .avatar-head {
+      width: 40px;
+      height: 40px;
+      background-color: #222;
+      border-radius: 50%;
+    }
+
+    .avatar-body {
+      width: 60px;
+      height: 30px;
+      background-color: #222;
+      border-radius: 30px 30px 0 0;
+      margin-top: 5px;
+    }
+
+    .input-box {
+      margin: 10px 0;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 250px;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #222;
+      border-radius: 8px;
+      outline: none;
+      font-family: 'Righteous', cursive;
+    }
+
+    input:focus {
+      border-color: #007BFF;
+    }
+
+    .password-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    #passwordInput {
+      padding-right: 40px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      fill: #444;
+    }
+
+    .toggle-password:hover {
+      fill: #007BFF;
+    }
+
+    .forgot-password {
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+
+    .forgot-password a {
+      text-decoration: none;
+      color: #007BFF;
+      font-size: 14px;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+
+    .submit-btn {
+      background-color: #222;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Righteous', cursive;
+      transition: background-color 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #007BFF;
+    }
+
+    .icon-layer {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+    }
+
+    .icon-layer svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transition: opacity 0.3s ease;
+    }
+
+    .icon-hidden {
+      opacity: 0;
+    }
+
+    .icon-visible {
+      opacity: 1;
+    }
+
+    .or-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .or-divider::before,
+    .or-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .or-divider span {
+      margin: 0 10px;
+      color: #777;
+      font-size: 14px;
+      font-family: 'Righteous', cursive;
+    }
+  </style>
+</head>
+<body>
+  <div class="sign-in-container">
+    <div class="guest-avatar-large">
+      <div class="avatar-head"></div>
+      <div class="avatar-body"></div>
+    </div>
+
+    <div class="input-box">
+      <input id="emailInput" type="text" placeholder="Email" />
+    </div>
+
+    <div class="input-box password-wrapper">
+      <input type="password" id="passwordInput" placeholder="Password" />
+      <div class="icon-layer toggle-password" onclick="togglePassword()">
+        <!-- [Eye icons unchanged] -->
+        <svg id="eyeOpen" class="icon-visible" viewBox="0 0 24 24" fill="currentColor">
+          <path d="..."/>
+        </svg>
+        <svg id="eyeClosed" class="icon-hidden" viewBox="0 0 24 24" fill="currentColor">
+          <path d="..."/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="forgot-password">
+      <a href="#">Forgot password?</a>
+    </div>
+
+    <form id="signin-form" onsubmit="handleEmailPasswordSignIn(event)">
+      <button type="submit" class="submit-btn">Sign In</button>
+    </form>
+
+    <div class="or-divider"><span>or</span></div>
+
+    <form onsubmit="fetchClassroomData(event)">
+      <button type="submit" class="submit-btn">Sign in With Google</button>
+    </form>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const input = document.getElementById("passwordInput");
+      const eyeOpen = document.getElementById("eyeOpen");
+      const eyeClosed = document.getElementById("eyeClosed");
+
+      if (input.type === "password") {
+        input.type = "text";
+        eyeOpen.classList.remove("icon-visible");
+        eyeOpen.classList.add("icon-hidden");
+        eyeClosed.classList.remove("icon-hidden");
+        eyeClosed.classList.add("icon-visible");
+      } else {
+        input.type = "password";
+        eyeOpen.classList.remove("icon-hidden");
+        eyeOpen.classList.add("icon-visible");
+        eyeClosed.classList.remove("icon-visible");
+        eyeClosed.classList.add("icon-hidden");
+      }
+    }
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDgt47saNP2MY1CYZ9DKlMUIBvLODhbSoY",
+      authDomain: "peer-a2a78.firebaseapp.com",
+      projectId: "peer-a2a78",
+      storageBucket: "peer-a2a78.appspot.com",
+      messagingSenderId: "366889068662",
+      appId: "1:366889068662:web:ffa8754a3ce3330396d757",
+      measurementId: "G-98GY2G56G4"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Email/password sign-in
+    async function handleEmailPasswordSignIn(event) {
+      event.preventDefault();
+      const email = document.getElementById("emailInput").value;
+      const password = document.getElementById("passwordInput").value;
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        console.log("Signed in with email/password");
+        window.location.href = "app.html";
+      } catch (error) {
+        alert("Sign-in failed: " + error.message);
+        console.error(error);
+      }
+    }
+
+    // Google Classroom OAuth2
+    async function getAccessToken() {
+      return new Promise((resolve, reject) => {
+        const client = google.accounts.oauth2.initTokenClient({
+          client_id: '366889068662-o3cpc66qp16bqp9faihh8qohgampaqiv.apps.googleusercontent.com',
+          scope: [
+            'https://www.googleapis.com/auth/classroom.courses.readonly',
+            'https://www.googleapis.com/auth/classroom.coursework.me.readonly',
+            'https://www.googleapis.com/auth/classroom.student-submissions.me.readonly',
+            'https://www.googleapis.com/auth/classroom.profile.emails',
+            'https://www.googleapis.com/auth/classroom.profile.photos',
+            'https://www.googleapis.com/auth/classroom.announcements.readonly',
+            'https://www.googleapis.com/auth/classroom.courseworkmaterials.readonly',
+            'https://www.googleapis.com/auth/classroom.push-notifications',
+            'https://www.googleapis.com/auth/classroom.topics.readonly'
+          ].join(' '),
+          callback: (tokenResponse) => {
+            if (tokenResponse && tokenResponse.access_token) {
+              resolve(tokenResponse.access_token);
+            } else {
+              reject(new Error("No access token received."));
+            }
+          }
+        });
+
+        client.requestAccessToken();
+      });
+    }
+
+   async function fetchClassroomData(event) {
+  event.preventDefault();
+
+  let token, credential, firebaseUser;
+
+  try {
+    // Step 1: Get Google OAuth token
+    token = await getAccessToken();  // You already have this working
+
+    // Step 2: Sign in to Firebase using Google credential
+    credential = firebase.auth.GoogleAuthProvider.credential(null, token);
+    const userCredential = await firebase.auth().signInWithCredential(credential);
+    firebaseUser = userCredential.user;
+
+  } catch (err) {
+    alert("Google Sign-In failed: " + err.message);
+    return;
+  }
+
+  const headers = { Authorization: `Bearer ${token}` };
+
+  try {
+    // Step 3: Get user info from Google (optional but nice for profile)
+    const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { headers });
+    const userData = await userInfoRes.json();
+
+    // Step 4: Save user data to Firestore (must match Firestore rules)
+    const userRef = db.collection("users").doc(firebaseUser.uid);
+    await userRef.set({
+      email: userData.email,
+      name: userData.name,
+      picture: userData.picture,
+      lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    // Step 5: Get Google Classroom courses
+    const coursesRes = await fetch("https://classroom.googleapis.com/v1/courses", { headers });
+    const coursesData = await coursesRes.json();
+
+    if (!coursesData.courses || coursesData.courses.length === 0) {
+      console.log("No courses found.");
+      return;
+    }
+
+    for (const course of coursesData.courses) {
+      const courseId = course.id;
+      const courseRef = userRef.collection("courses").doc(courseId);
+
+      // Save basic course info
+      await courseRef.set({
+        name: course.name,
+        section: course.section || "",
+        description: course.description || ""
+      }, { merge: true });
+
+      // Save announcements and courseWork (assignments)
+      const endpoints = [
+        { url: `https://classroom.googleapis.com/v1/courses/${courseId}/announcements`, key: "announcements" },
+        { url: `https://classroom.googleapis.com/v1/courses/${courseId}/courseWork`, key: "courseWork" }
+      ];
+
+      for (const { url, key } of endpoints) {
+        const res = await fetch(url, { headers });
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.error(`Error from ${url}:`, data);
+          continue;
+        }
+
+        const firestoreKey = key === "courseWork" ? "assignments" : key;
+
+        if (Array.isArray(data[key])) {
+          for (const item of data[key]) {
+            // Include UID so Firestore rules allow it
+            await courseRef.collection(firestoreKey).doc(item.id).set({
+              ...item,
+              userId: firebaseUser.uid
+            });
+          }
+        }
+      }
+    }
+
+    // Success: Redirect to app
+    window.location.href = "app.html";
+  } catch (err) {
+    console.error("Error fetching Classroom data:", err);
+    alert("Failed to fetch Google Classroom data.");
+  }
+}
+
+  </script>
+</body>
+</html>

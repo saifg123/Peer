@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notion-Style Calendar App</title>
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --sidebar: #ffffffee;
+      --main: #ffffffdd;
+      --text: #1c1c1e;
+      --muted: #8e8e93;
+      --highlight: #007aff;
+      --radius: 12px;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s ease-in-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: var(--transition);
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      height: 64px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      box-shadow: var(--shadow);
+      z-index: 10;
+    }
+
+    header div {
+      font-weight: 500;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    nav, .calendar-sidebar, .right-sidebar {
+      width: 260px;
+      background: var(--sidebar);
+      backdrop-filter: blur(10px);
+      padding: 24px 16px;
+      overflow-y: auto;
+      box-shadow: inset -1px 0 0 #ddd;
+    }
+
+    nav {
+      padding-left: 0;
+      border-right: 1px solid #ddd;
+    }
+
+    nav ul {
+      padding-left: 0;
+    }
+
+    nav li {
+      list-style: none;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    nav li:hover, nav li.active {
+      background-color: #e5e5ea;
+      color: var(--text);
+    }
+
+    nav h2 {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      padding-left: 16px;
+    }
+
+    .calendar-sidebar {
+      display: none;
+      border-right: 1px solid #ddd;
+    }
+
+    .calendar-sidebar select, .calendar-sidebar button {
+      display: block;
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: var(--radius);
+      background: white;
+    }
+
+    .calendar-sidebar button {
+      background: var(--highlight);
+      color: white;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+
+    .calendar-sidebar button:hover {
+      background: #005fcc;
+    }
+
+    .content {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
+      background: var(--main);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 24px;
+    }
+
+    .block {
+      background: #fff;
+      padding: 14px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      transition: var(--transition);
+    }
+
+    .block:focus {
+      outline: 2px solid var(--highlight);
+    }
+
+    .add-block {
+      background: var(--highlight);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .add-block:hover {
+      background: #005fcc;
+    }
+
+    .timeline {
+      display: none;
+    }
+
+    .hour-block {
+      position: relative;
+      height: 60px;
+      padding-left: 60px;
+      border-top: 1px solid #ccc;
+    }
+
+    .hour-block:hover {
+      background: #f0f0f5;
+    }
+
+    .hour-label {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .right-sidebar {
+      display: none;
+      border-left: 1px solid #ddd;
+    }
+
+    #todoPanel, #chatPanel {
+      display: none;
+    }
+
+    #todoPanel.active, #chatPanel.active {
+      display: block;
+    }
+
+    .todo-list li {
+      list-style: none;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #fff;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+
+    .todo-list li input[type="checkbox"] {
+      margin-right: 12px;
+    }
+
+    .chat-log {
+      max-height: 200px;
+      overflow-y: auto;
+      background: white;
+      padding: 12px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+
+    .chat-box .bubble {
+      padding: 10px 14px;
+      background: #e0e0ff;
+      margin-bottom: 8px;
+      border-radius: var(--radius);
+    }
+
+    .chat-box textarea {
+      width: 100%;
+      height: 120px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: var(--radius);
+      resize: none;
+      margin-bottom: 12px;
+    }
+
+    .chat-box button, .todo-list + button {
+      padding: 12px;
+      border: none;
+      background: var(--highlight);
+      color: white;
+      border-radius: var(--radius);
+      width: 100%;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .chat-box button:hover, .todo-list + button:hover {
+      background: #005fcc;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>Notion Calendar</div>
+    <div>User ▾</div>
+  </header>
+  <main>
+    <nav id="defaultSidebar">
+      <h2>Navigation</h2>
+      <ul>
+        <li onclick="showView('notes')" class="active">📝 Notes</li>
+        <li onclick="showView('calendar')">📅 Calendar</li>
+        <li>🔔 Reminders</li>
+        <li>🗂️ Projects</li>
+        <li>📊 Goals</li>
+      </ul>
+    </nav>
+
+    <div class="calendar-sidebar" id="calendarSidebar">
+      <h2>Calendar View</h2>
+      <select><option>May 2025</option></select>
+      <select><option>Monday</option></select>
+      <button onclick="showView('notes')">← Back to App</button>
+    </div>
+
+    <div class="content" id="mainContent">
+      <div id="notesView">
+        <div class="page-title" contenteditable="true">Untitled Page</div>
+        <div class="blocks" id="blocks">
+          <div class="block" contenteditable="true">Start typing...</div>
+        </div>
+        <button class="add-block" onclick="addBlock()">+ Add block</button>
+      </div>
+      <div class="timeline" id="calendarTimeline"></div>
+    </div>
+
+    <div class="right-sidebar" id="rightSidebar">
+      <div id="todoPanel" class="active">
+        <h2>To-Do</h2>
+        <input type="text" placeholder="New task..." onkeydown="addTodo(event)" />
+        <ul class="todo-list" id="todoList"></ul>
+        <button onclick="toggleChat(true)">💬 Chat with AI</button>
+      </div>
+      <div id="chatPanel">
+        <h2>AI Chat</h2>
+        <div class="chat-log" id="chatLog"></div>
+        <textarea id="chatInput" placeholder="Ask something..."></textarea>
+        <button onclick="toggleChat(false)">← Back to To-Do</button>
+      </div>
+    </div>
+  </main>
+  <script>
+    function addBlock() {
+      const block = document.createElement('div');
+      block.className = 'block fade-in';
+      block.contentEditable = true;
+      block.textContent = 'New block';
+      document.getElementById('blocks').appendChild(block);
+      block.focus();
+    }
+
+    function showView(view) {
+      document.querySelectorAll('nav li').forEach(el => el.classList.remove('active'));
+      if (view === 'notes') {
+        document.querySelectorAll('nav li')[0].classList.add('active');
+        document.getElementById('notesView').style.display = 'block';
+        document.getElementById('calendarTimeline').style.display = 'none';
+        document.getElementById('calendarSidebar').style.display = 'none';
+        document.getElementById('defaultSidebar').style.display = 'block';
+        document.getElementById('rightSidebar').style.display = 'none';
+      } else if (view === 'calendar') {
+        document.querySelectorAll('nav li')[1].classList.add('active');
+        document.getElementById('notesView').style.display = 'none';
+        document.getElementById('calendarTimeline').style.display = 'block';
+        document.getElementById('calendarSidebar').style.display = 'block';
+        document.getElementById('defaultSidebar').style.display = 'none';
+        document.getElementById('rightSidebar').style.display = 'block';
+        renderTimeline();
+      }
+    }
+
+    function renderTimeline() {
+      const container = document.getElementById('calendarTimeline');
+      container.innerHTML = '';
+      for (let i = 0; i < 24; i++) {
+        const block = document.createElement('div');
+        block.className = 'hour-block fade-in';
+        block.innerHTML = `<div class="hour-label">${String(i).padStart(2, '0')}:00</div>`;
+        container.appendChild(block);
+      }
+    }
+
+    function toggleChat(showChat) {
+      const todo = document.getElementById('todoPanel');
+      const chat = document.getElementById('chatPanel');
+      if (showChat) {
+        todo.classList.remove('active');
+        chat.classList.add('active');
+      } else {
+        chat.classList.remove('active');
+        todo.classList.add('active');
+      }
+    }
+
+    function addTodo(e) {
+      if (e.key === 'Enter' && e.target.value.trim()) {
+        const item = document.createElement('li');
+        item.innerHTML = `<input type="checkbox"> ${e.target.value}`;
+        document.getElementById('todoList').appendChild(item);
+        e.target.value = '';
+      }
+    }
+
+    renderTimeline();
+  </script>
+</body>
+</html>

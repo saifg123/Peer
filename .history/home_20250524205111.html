@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Peer – Home</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Quicksand:wght@300..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* ==============================================
+       GLOBAL RESET & BODY SETUP
+       ============================================== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Quicksand', sans-serif;
+    }
+    body::after {
+  /* existing styles... */
+  transition: background 2s ease, filter 2s ease, opacity 2s ease;
+}
+    body {
+      position: relative;
+      background: linear-gradient(135deg, #b3b3f5 0%, #ffe3e3 100%);
+      transition: background 2s ease;
+    }
+    body::before,
+
+
+
+    /* Animated blobs */
+    body::before, body::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: float 10s ease-in-out infinite alternate;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: #fff;
+      top: -200px; left: -200px;
+      filter: blur(150px);
+      animation-duration: 12s;
+    }
+    body::after {
+      width: 300px; height: 300px;
+      background: #3f51b5;
+      top: 60%; left: 70%;
+      filter: blur(100px);
+      animation-duration: 8s;
+      animation-delay: 2s;
+    }
+    @keyframes float {
+      to { transform: translate3d(50px,50px,0) scale(1.1); opacity: 0.7; }
+    }
+
+    /* Subtle stripe texture */
+    .stripe-overlay {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,0.05) 0px,
+        rgba(255,255,255,0.05) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+      z-index: 1;
+    }
+
+    /* ==============================================
+       CONTAINER & POSITIONING
+       ============================================== */
+    .container {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      gap: 32px;
+      z-index: 2; /* above blobs */
+    }
+
+    /* ==============================================
+       HEADER
+       ============================================== */
+    .header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #3f51b5;
+      padding: 18px 32px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .header-title {
+      font-family: 'Lexend', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 162px;
+      color: #fff;
+    }
+    .header-home {
+      font-size: 2.2rem;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+    .guest-icon {
+      width: 32px; height: 32px;
+      background: #f5f6fa;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .guest-icon svg {
+      width: 22px; height: 22px;
+      fill: #3f51b5;
+    }
+
+    /* ==============================================
+       BOXES
+       ============================================== */
+    .box {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      font-size: 1.2rem;
+      color: #222;
+      cursor: default;
+      transition: background 0.3s ease;
+    }
+    .box:hover {
+      background: #b3b3f5;
+    }
+    .continue-box { cursor: pointer; }
+    .to-do-box { display: flex; align-items: center; justify-content: center; }
+
+    /* ==============================================
+       FADE-IN ANIMATION
+       ============================================== */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 0.5s ease forwards;
+    }
+    /* stagger */
+    .header.fade-in       { animation-delay: 0s; }
+    .continue-box.fade-in { animation-delay: 0.5s; }
+    .to-do-box.fade-in    { animation-delay: 1s; }
+  </style>
+
+ <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // click handler
+    const box = document.querySelector('.continue-box');
+    if (box) {
+      box.addEventListener('click', () => {
+        window.location.href = 'app.html';
+      });
+    }
+    // trigger fade-ins
+    document.querySelectorAll('.fade-in')
+      .forEach(el => el.classList.add('fade-in'));
+  });
+
+  window.addEventListener('load', () => {
+    // Animate background
+    document.body.style.background = 'linear-gradient(135deg, #fff 0%, #f0f0f0 100%)';
+
+    // Animate blobs after delay (optional)
+    setTimeout(() => {
+      const before = document.createElement('style');
+      before.textContent = `
+        body::before {
+          background: #f0f0f0 !important;
+          filter: blur(100px) !important;
+        }
+        body::after {
+          background: #ffffff !important;
+          filter: blur(80px) !important;
+        }
+      `;
+      document.head.appendChild(before);
+    }, 0);
+  });
+</script>
+
+</head>
+
+<body>
+  <div class="stripe-overlay"></div>
+
+  <div class="container">
+    <div class="header fade-in">
+      <div class="header-title">
+        Peer <span class="header-home">Welcome to Peer</span>
+      </div>
+      <div class="guest-icon">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M12 14c-4 0-7 2-7 4v2h14v-2c0-2-3-4-7-4z"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="continue-box box fade-in">
+      Continue where you left off, ----.
+    </div>
+
+    <div class="to-do-box box fade-in">
+      To-do...
+    </div>
+  </div>
+</body>
+</html>

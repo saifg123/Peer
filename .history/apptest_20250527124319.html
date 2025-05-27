@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notion-Style Calendar App</title>
+  <style>
+    :root {
+      --bg: #f4f4f5;
+      --sidebar: #ffffffee;
+      --main: #ffffffdd;
+      --text: #1c1c1e;
+      --muted: #8e8e93;
+      --highlight: #ffca68;
+      --radius: 12px;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s ease-in-out;
+    }
+
+    body[data-theme="dark"] {
+      --bg: #1c1c1e;
+      --sidebar: #2c2c2e;
+      --main: #2c2c2e;
+      --text: #f4f4f5;
+      --muted: #8e8e93;
+      --highlight: #ffca68;
+    }
+
+    html {
+      font-size: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: var(--transition);
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      height: 56px;
+      background: var(--sidebar);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-shadow: var(--shadow);
+      z-index: 10;
+    }
+
+    header .left-tools {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 16px;
+    }
+
+    header .profile-dropdown {
+      position: relative;
+    }
+
+    header .profile-dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: 48px;
+      background: var(--sidebar);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: none;
+      flex-direction: column;
+      padding: 6px;
+      min-width: 140px;
+    }
+
+    header .profile-dropdown-menu button {
+      background: none;
+      border: none;
+      padding: 8px 10px;
+      text-align: left;
+      width: 100%;
+      font-size: 13px;
+      color: var(--text);
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+
+    header .profile-dropdown-menu button:hover {
+      background: #e5e5ea;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    nav {
+      width: 220px;
+      background: var(--sidebar);
+      padding: 20px 12px;
+      overflow-y: auto;
+      border-right: 1px solid #ddd;
+    }
+
+    nav ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    nav li {
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    nav li:hover,
+    nav li.active {
+      background-color: #e5e5ea;
+    }
+
+    nav h2 {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      padding-left: 12px;
+    }
+
+    .calendar-sidebar {
+      display: none;
+      width: 220px;
+      background: var(--sidebar);
+      padding: 14px;
+      border-right: 1px solid #ddd;
+    }
+
+    .calendar-sidebar select,
+    .calendar-sidebar button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: var(--radius);
+      background: white;
+      font-size: 13px;
+    }
+
+    .calendar-sidebar button {
+      background: var(--highlight);
+      color: white;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+    }
+
+    .calendar-sidebar button:hover {
+      background: #005fcc;
+    }
+
+    .view-options {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .view-options button {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background: var(--main);
+    }
+
+    .timeline {
+      display: none;
+    }
+
+    .right-sidebar {
+      width: 220px;
+      background: var(--sidebar);
+      border-left: 1px solid #ddd;
+      padding: 14px;
+      display: none;
+    }
+
+    .right-sidebar button {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      border: none;
+      background: var(--highlight);
+      color: white;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .right-sidebar button:hover {
+      background: #005fcc;
+    }
+
+    .hour-block {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      min-height: 50px;
+      font-size: 13px;
+      font-weight: 500;
+      background: var(--main);
+    }
+
+    .block {
+      margin-top: 6px;
+      background: white;
+      padding: 5px 8px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .block:focus {
+      outline: 2px solid var(--highlight);
+    }
+
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: var(--radius);
+      resize: vertical;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .chat-log {
+      background: var(--main);
+      padding: 10px;
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+    }
+
+    .bubble {
+      background: #e5e5ea;
+      padding: 8px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="left-tools">Notion Calendar</div>
+    <div class="profile-dropdown">
+      <button onclick="toggleProfileMenu()">👤</button>
+      <div class="profile-dropdown-menu" id="profileMenu">
+        <button onclick="toggleTheme()">Toggle Dark Mode</button>
+        <button>Settings</button>
+        <button>Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <nav>
+      <h2>Navigation</h2>
+      <ul>
+        <li onclick="activateCalendar(this)">Calendar</li>
+        <li>Tasks</li>
+        <li>Notes</li>
+        <li>Projects</li>
+        <li>Teams</li>
+        <li>Goals</li>
+      </ul>
+    </nav>
+
+    <div class="calendar-sidebar" id="calendarSidebar">
+      <div class="view-options">
+        <button onclick="switchView('day')">Day</button>
+        <button onclick="switchView('week')">Week</button>
+        <button onclick="switchView('month')">Month</button>
+      </div>
+      <select>
+        <option>May 2025</option>
+        <option>June 2025</option>
+      </select>
+      <button onclick="showTodo()">To-Do List</button>
+      <button onclick="showChat()">Chat with AI</button>
+    </div>
+
+    <div class="content timeline" id="timeline"></div>
+
+    <div class="right-sidebar" id="rightSidebar">
+      <div id="todoPanel">
+        <ul>
+          <li><input type="checkbox" /> Task One</li>
+          <li><input type="checkbox" /> Task Two</li>
+        </ul>
+      </div>
+      <div id="chatPanel" style="display:none;">
+        <div class="chat-log">
+          <div class="bubble">Hi, how can I help?</div>
+        </div>
+        <textarea placeholder="Type your message..."></textarea>
+        <button>Send</button>
+      </div>
+      <button onclick="backToApp()">Back to App</button>
+    </div>
+  </main>
+
+  <script>
+    function toggleTheme() {
+      document.body.dataset.theme = document.body.dataset.theme === 'dark' ? '' : 'dark';
+    }
+
+    function toggleProfileMenu() {
+      const menu = document.getElementById('profileMenu');
+      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+      menu.style.flexDirection = 'column';
+    }
+
+    function activateCalendar(el) {
+      document.getElementById('calendarSidebar').style.display = 'block';
+      document.getElementById('timeline').style.display = 'block';
+      document.getElementById('rightSidebar').style.display = 'block';
+      document.querySelectorAll("nav li").forEach(li => li.classList.remove("active"));
+      el.classList.add("active");
+    }
+
+    function switchView(view) {
+      alert(`Switched to ${view} view`);
+    }
+
+    function showTodo() {
+      document.getElementById('todoPanel').style.display = 'block';
+      document.getElementById('chatPanel').style.display = 'none';
+    }
+
+    function showChat() {
+      document.getElementById('todoPanel').style.display = 'none';
+      document.getElementById('chatPanel').style.display = 'block';
+    }
+
+    function backToApp() {
+      location.reload();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const timeline = document.getElementById('timeline');
+      const hours = Array.from({ length: 24 }, (_, i) => {
+        const hour = i % 12 === 0 ? 12 : i % 12;
+        const ampm = i < 12 ? 'AM' : 'PM';
+        return `${hour}:00 ${ampm}`;
+      });
+      timeline.innerHTML = hours.map(h => `<div class="hour-block">${h}</div>`).join('');
+    });
+  </script>
+</body>
+</html>

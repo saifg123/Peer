@@ -1,0 +1,532 @@
+/* Base */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f5f7fa;
+  color: #333;
+}
+.calendar-app {
+  max-width: 900px;
+  margin: 20px 0 20px 20px;
+  /* ✨ Rounded outer container */
+  border-radius: 12px;
+  background: #3f51b5;           /* ensure bgcolor behind rounded edges */
+  overflow: hidden;
+}
+
+/* Controls */
+#calendar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px;
+  background: #79866D;
+  border-bottom: 5px solid #4D6351;
+}
+#calendar-controls button {
+  font-size: 1.2em;
+  padding: 6px 10px;
+  background: #e0e0e0;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#calendar-controls button:hover {
+  background: #d0d0d0;
+}
+#view-label {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin: 0 10px;
+}
+
+/* Transition wrapper */
+.calendar-view {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.calendar-view.transitioning {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+/* ========== DAY VIEW ========== */
+.day-grid {
+  font-family: Quicksand, sans-serif;
+  display: grid;
+  grid-template-rows: repeat(24, 40px);
+  border-left: 1px solid #ccc;
+  position: relative;
+}
+.day-cell {
+  font-family: Quicksand, sans-serif;
+  border-top: 1px solid #eee;
+  padding-left: 50px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow-y: auto;
+  padding: 2px;
+  transition: background 0.2s;
+}
+
+
+.day-cell span {
+  font-family: Quicksand, sans-serif;
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 12px;
+  color: #888;
+}
+
+/* ========== WEEK VIEW ========== */
+.week-grid {
+  font-family: Quicksand, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+.week-labels {
+  font-family: Quicksand, sans-serif;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: #fafafa;
+  border-bottom: 1px solid #ccc;
+}
+.week-label {
+  font-family: Quicksand, sans-serif;
+  text-align: center;
+  padding: 8px 0;
+  font-weight: bold;
+}
+.week-row {
+  font-family: Quicksand, sans-serif;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  height: 45px; /* Or whatever height you want for each day */
+}
+
+.week-cell {
+  font-family: Quicksand, sans-serif;
+  border: 1px solid #eee;
+  position: relative;
+  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow-y: auto;
+  transition: background 0.2s;
+}
+
+
+
+/* ========== MONTH VIEW ========== */
+.month-grid {
+  font-family: Quicksand, sans-serif;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-top: 1px solid #ccc;
+}
+.month-labels {
+  font-family: Quicksand, sans-serif;
+  display: contents;
+}
+.month-label {
+  font-family: Quicksand, sans-serif;
+  text-align: center;
+  font-weight: bold;
+  padding: 8px 0;
+  border-bottom: 1px solid #ccc;
+}
+.month-row {
+  font-family: Quicksand, sans-serif;
+  display: contents;
+}
+.month-cell {
+  font-family: Quicksand, sans-serif;
+  height: 100px; /* or whatever height you want */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.month-cell .event-item {
+  font-family: Quicksand, sans-serif;
+  align-self: flex-start; /* assignment goes under the date */
+}
+
+.month-cell.empty {
+  font-family: Quicksand, sans-serif;
+  background: #f9f9f9;
+  color: #ccc;
+}
+
+
+
+/* ========== MULTI‐MONTH (Quarter/Semester/Year) ========== */
+.multi-month-grid {
+  font-family: Quicksand, sans-serif;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 20px;
+  padding: 20px;
+}
+.month-tile {
+  font-family: Quicksand, sans-serif;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.month-title {
+  font-family: Quicksand, sans-serif;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.month-weekdays {
+  font-family: Quicksand, sans-serif;
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  font-size: 0.8em;
+  font-weight: bold;
+  text-align: center;
+  color: #555;
+  margin-bottom: 4px;
+}
+.month-days {
+  font-family: Quicksand, sans-serif;
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  text-align: center;
+}
+.day {
+  font-family: Quicksand, sans-serif;
+  padding: 4px 0;
+  font-size: 0.85em;
+  /* ✨ Rounded mini‐cells + hover */
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.empty { visibility: hidden; }
+.day:hover {
+  font-family: Quicksand, sans-serif;
+  background: #e6f7ff;
+}
+.day.highlight {
+  font-family: Quicksand, sans-serif;
+  background-color: #ffeb3b;
+  font-weight: bold;
+  border: 2px solid #f57c00;
+  border-radius: 4px;
+}
+/* === Flex container for calendar + chat === */
+.app-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+
+
+.chat-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.chat-message {
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.chat-message.user {
+  background: #e0f7fa;
+  align-self: flex-end;
+}
+
+.chat-message.bot {
+  background: #f1f1f1;
+  align-self: flex-start;
+}
+
+.chat-input-area {
+  display: flex;
+  border-top: 1px solid #ddd;
+}
+
+#chat-input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  font-size: 1em;
+  outline: none;
+}
+
+#chat-send {
+  border: none;
+  background: #007aff;
+  color: white;
+  padding: 0 20px;
+  cursor: pointer;
+}
+#chat-send:hover {
+  background: #005ec2;
+}
+#event-search {
+  margin-left: 0.5em;
+  padding: 2px 6px;
+  font-size: 0.85em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100px;
+}
+#event-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+#event-modal.hidden {
+  display: none;
+}
+
+#event-modal-content {
+  background: white;
+  padding: 1em;
+  border-radius: 6px;
+  width: 300px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+#event-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+
+#event-modal-header span {
+  font-weight: bold;
+}
+
+#event-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+#event-modal-text {
+  width: 180px;
+  height: 40px;
+  font-size: 0.9em;
+  resize: none;
+  margin-bottom: 0.5em;
+  padding: 4px;
+}
+
+/* Align the Add Note button to the right of the day header */
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#open-note-day {
+  font-size: 0.9em;
+  padding: 4px 8px;
+  border: none;
+  background: #007aff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+#open-note-day:hover {
+  background: #005ec2;
+}
+
+
+/* Style the note banner under the header */
+.note-banner {
+  background: #fffae6;
+  color: #333;
+  padding: 4px 8px;
+  margin: 4px 0;
+  border: 1px solid #ffd54f;
+  border-radius: 4px;
+  cursor: grab;
+  user-select: none;
+}
+
+/* When dragging */
+.note-banner:active {
+  opacity: 0.6;
+}
+
+/* Allow dropping into hour slots */
+.day-cell {
+  position: relative;
+}
+.day-cell.drag-over {
+  background: #e0ffe0;
+}
+/* Force the modal textarea to be small */
+#event-modal-text {
+  width: 180px !important;
+  height: 40px !important;
+  min-height: 0 !important;
+  resize: none !important;
+  font-size: 0.9em;
+  padding: 4px;
+  box-sizing: border-box;
+}
+/* Day-view cells */
+.day-cell {
+  /* your existing rules… */
+  transition: background 0.2s;
+}
+.day-cell:hover {
+  background: #e6f7ff;
+}
+
+/* Week-view cells */
+
+
+.week-cell {
+  /* your existing rules… */
+  transition: background 0.2s;
+}
+.week-cell:hover {
+  background: #e6f7ff;
+}
+
+/* Month-view cells */
+.month-cell {
+  /* your existing rules… */
+  transition: background 0.2s;
+}
+.month-cell:hover {
+  background: #e6f7ff;
+}
+.note-banner {
+  background: #e8f0fe;
+  border-left: 4px solid #4285f4;
+  padding: 4px 6px;
+  margin: 4px 0;
+  font-size: 0.85em;
+  border-radius: 4px;
+}
+.event-item {
+  font-size: 0.8em;
+  background: #e0f0ff;
+  margin: 2px 0;
+  padding: 2px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.month-events {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+
+.month-cell {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  box-sizing: border-box;
+}
+.note-banner {
+  background: #fffdc4;
+  border-left: 4px solid #f0c000;
+  padding: 4px 8px;
+  margin-top: 4px;
+  font-size: 0.9em;
+  border-radius: 4px;
+}
+/* —————— GPU-accelerated, smoothly transitioning ghost —————— */
+/* Drag ghost (Balatro-style) */
+.drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2000;
+  top: 0; left: 0;
+  will-change: transform, opacity;
+  transition:
+    transform 0.18s cubic-bezier(.22,1,.36,1),
+    box-shadow 0.18s cubic-bezier(.22,1,.36,1),
+    opacity 0.12s;
+  opacity: 0.96;
+  box-shadow:
+    0 6px 24px 0 rgba(0,0,0,0.18),
+    0 1.5px 4px 0 rgba(0,0,0,0.10);
+  border-radius: 12px;
+  background: linear-gradient(120deg, #fffbe7 80%, #ffe082 100%);
+  border: 2.5px solid #fbc02d;
+  filter: drop-shadow(0 2px 0 #fffde7);
+  transform: scale(1.08) rotate(-2deg);
+  padding: 6px 14px;
+  font-family: Quicksand, sans-serif;
+  font-size: 1.05em;
+  font-weight: 400;
+  color: #333;
+  text-shadow: 0 1px 0 #fffde7, 0 2px 4px #ffe082;
+  box-sizing: border-box;
+  cursor: grabbing;
+  user-select: none;
+}
+
+/* Animate ghost on drop */
+.drag-ghost.dropping {
+  opacity: 0;
+  transform: scale(0.92) rotate(2deg);
+  transition:
+    opacity 0.14s,
+    transform 0.14s cubic-bezier(.22,1,.36,1);
+}
+
+/* Drop target highlight (Balatro-style) */
+.day-cell.drag-over,
+.week-cell.drag-over,
+.month-cell.drag-over {
+  background: linear-gradient(90deg, #fffde7 80%, #ffe082 100%);
+  box-shadow: 0 0 0 3px #ffe082 inset, 0 2px 8px #ffe08233;
+  border-radius: 8px;
+  outline: 2px dashed #fbc02d;
+  outline-offset: -2px;
+  transition: background 0.18s, box-shadow 0.18s, outline 0.18s;
+}
+
+/* Bounce on drop */
+@keyframes drop-bounce {
+  0%   { transform: translateY(-4px) scale(1.02); }
+  50%  { transform: translateY(2px)  scale(0.98); }
+  100% { transform: translateY(0)     scale(1); }
+}
+
+.note-banner.drop-bounce {
+  animation: drop-bounce 0.4s ease-out forwards;
+}
+
+
